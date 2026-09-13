@@ -110,6 +110,13 @@ make preview        # writes preview/emotions.png and preview/timeline.png
 `preview/preview arc angry out.bin` renders a single transition frame by
 frame, which is the fastest way to judge a tweak.
 
+`preview/web/index.html` is a small browser player for the same frames - open
+it locally, or regenerate it after a change with:
+
+```sh
+python3 tools/host/make_web_preview.py preview/web
+```
+
 There is also a [Wokwi](https://wokwi.com) setup in `sim/` if you would rather
 watch it run on a simulated board.
 

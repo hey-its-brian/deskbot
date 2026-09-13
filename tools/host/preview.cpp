@@ -34,7 +34,7 @@ static void step(Face& face, HostGfx& g, int frames, FILE* out, bool capture) {
 
 int main(int argc, char** argv) {
   if (argc < 3) {
-    fprintf(stderr, "usage: preview <sheet|arc <name>|anim <seconds>> <out.bin>\n");
+    fprintf(stderr, "usage: preview <sheet | arc <name> | anim <sec> | poke <n> | doze <n>> <out.bin>\n");
     return 2;
   }
   const char* mode = argv[1];
@@ -86,6 +86,42 @@ int main(int argc, char** argv) {
     brain.begin(face, 0xBEEFu);
     const int n = (int)(seconds * 30.0f);
     for (int i = 0; i < n; ++i) {
+      brain.update(kDt);
+      face.update(kDt);
+      face.draw(g);
+      emit(out, g);
+    }
+    frames = n;
+    fclose(out);
+  } else if (strcmp(mode, "poke") == 0 && argc >= 4) {
+    // Idle for a moment, get poked, react.
+    const int n = atoi(argv[2]);
+    FILE* out = fopen(argv[3], "wb");
+    if (!out) return 1;
+    Face face;
+    Personality brain;
+    face.begin(0x51EEDu);
+    brain.begin(face, 0x51EEDu);
+    for (int i = 0; i < n; ++i) {
+      if (i == 12) brain.onInteraction(TOUCH_POKE);
+      brain.update(kDt);
+      face.update(kDt);
+      face.draw(g);
+      emit(out, g);
+    }
+    frames = n;
+    fclose(out);
+  } else if (strcmp(mode, "doze") == 0 && argc >= 4) {
+    // Nodding off, with the Z's.
+    const int n = atoi(argv[2]);
+    FILE* out = fopen(argv[3], "wb");
+    if (!out) return 1;
+    Face face;
+    Personality brain;
+    face.begin(0xD02Eu);
+    brain.begin(face, 0xD02Eu);
+    for (int i = 0; i < n; ++i) {
+      if (i == 6) brain.sleep();
       brain.update(kDt);
       face.update(kDt);
       face.draw(g);

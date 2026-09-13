@@ -1,0 +1,537 @@
+<title>Desk Buddy Face</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+  /* Light is the base set; the panel tokens are deliberately theme-independent,
+     because the OLED is a physical object and looks the same in any room. */
+  :root {
+    --ground: #e7eaed;
+    --surface: #ffffff;
+    --edge: #ccd3d9;
+    --edge-soft: #e0e5ea;
+    --ink: #0f151b;
+    --muted: #5b6874;
+    --accent: #0b757f;
+    --accent-ink: #ffffff;
+    --accent-soft: #d9ecef;
+
+    --panel-body: #090c10;
+    --panel-edge: #262d35;
+    --panel-screw: #3a444e;
+    --pixel: #dff2ff;
+    --bloom: rgba(120, 214, 235, 0.55);
+
+    --radius: 10px;
+    --font-display: "IBM Plex Sans Condensed", "Helvetica Neue", Arial, sans-serif;
+    --font-body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0a0c0f;
+      --surface: #12161b;
+      --edge: #262d35;
+      --edge-soft: #1b2128;
+      --ink: #e4e9ee;
+      --muted: #8b98a5;
+      --accent: #3fd3dd;
+      --accent-ink: #06262a;
+      --accent-soft: #10313a;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0a0c0f;
+    --surface: #12161b;
+    --edge: #262d35;
+    --edge-soft: #1b2128;
+    --ink: #e4e9ee;
+    --muted: #8b98a5;
+    --accent: #3fd3dd;
+    --accent-ink: #06262a;
+    --accent-soft: #10313a;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: 40px 56px;
+  }
+
+  /* ---- header ---- */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.1rem, 6vw, 3rem);
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede {
+    max-width: 62ch;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .lede strong { color: var(--ink); font-weight: 500; }
+
+  /* ---- bench ---- */
+  .bench {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 248px;
+    gap: 28px;
+    align-items: start;
+    margin-top: 36px;
+  }
+
+  @media (max-width: 760px) {
+    .bench { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  }
+
+  /* The bezel apes the printed case: black front, four screw heads. */
+  .bezel {
+    position: relative;
+    background: var(--panel-body);
+    border: 1px solid var(--panel-edge);
+    border-radius: 14px;
+    padding: 26px 22px;
+    box-shadow: 0 18px 40px -28px rgba(0, 0, 0, 0.9);
+  }
+
+  .bezel::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 13px;
+    pointer-events: none;
+    background: linear-gradient(148deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 42%);
+  }
+
+  .screw {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--panel-screw);
+  }
+  .screw.tl { top: 9px; left: 9px; }
+  .screw.tr { top: 9px; right: 9px; }
+  .screw.bl { bottom: 9px; left: 9px; }
+  .screw.br { bottom: 9px; right: 9px; }
+
+  .glass {
+    position: relative;
+    aspect-ratio: 2 / 1;
+    max-width: 100%;
+  }
+
+  .glass canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  /* Back copy is blurred and screened over the front one: phosphor bloom. */
+  #bloom {
+    filter: blur(7px);
+    opacity: 0.75;
+    mix-blend-mode: screen;
+  }
+
+  /* ---- transport ---- */
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  button {
+    font: inherit;
+    cursor: pointer;
+    color: inherit;
+    background: none;
+    border: none;
+  }
+
+  .play {
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: 999px;
+    padding: 8px 20px;
+    min-width: 92px;
+  }
+
+  .speed {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    padding: 6px 12px;
+    color: var(--muted);
+  }
+
+  .speed[aria-pressed="true"] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .readout {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .scrub {
+    height: 3px;
+    background: var(--edge-soft);
+    border-radius: 2px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+
+  .scrub span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+  }
+
+  /* ---- clip rail ---- */
+  .rail { display: flex; flex-direction: column; gap: 22px; }
+
+  .rail h2 {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .chip {
+    font-size: 0.84rem;
+    border: 1px solid var(--edge);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 5px 13px;
+    color: var(--muted);
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .chip:hover { border-color: var(--accent); color: var(--ink); }
+
+  .chip[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- spec strip ---- */
+  .specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+    gap: 1px;
+    background: var(--edge-soft);
+    border: 1px solid var(--edge-soft);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 40px;
+  }
+
+  .spec { background: var(--surface); padding: 14px 16px; }
+
+  .spec dt {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .spec dd {
+    font-family: var(--font-display);
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- notes ---- */
+  .notes {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--edge-soft);
+    color: var(--muted);
+    font-size: 0.9rem;
+    max-width: 68ch;
+  }
+
+  .notes p { margin: 0 0 12px; }
+  .notes code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--accent-soft);
+    color: var(--ink);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .kbd {
+    font-family: var(--font-mono);
+    font-size: 0.78em;
+    border: 1px solid var(--edge);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0 5px;
+    color: var(--ink);
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ESP32-C3 Super Mini &middot; SSD1306 128&times;64 &middot; 30 fps</p>
+    <h1>Desk Buddy Face</h1>
+    <p class="lede">Every frame below was rendered by the <strong>actual firmware</strong>
+      &mdash; the same <code>Face.cpp</code> that runs on the board, compiled for
+      this machine and dumped a frame at a time. Pick a behaviour or an
+      expression and watch what the panel will do.</p>
+  </header>
+
+  <main class="bench">
+    <section>
+      <div class="bezel">
+        <i class="screw tl"></i><i class="screw tr"></i>
+        <i class="screw bl"></i><i class="screw br"></i>
+        <div class="glass">
+          <canvas id="bloom" width="128" height="64" aria-hidden="true"></canvas>
+          <canvas id="screen" width="128" height="64"
+                  aria-label="Animated robot face on a 128 by 64 pixel display"></canvas>
+        </div>
+      </div>
+
+      <div class="transport">
+        <button class="play" id="play" aria-pressed="true">Pause</button>
+        <button class="speed" id="speed" aria-pressed="false">1&times; speed</button>
+        <span class="readout" id="readout">frame 0 / 0</span>
+      </div>
+      <div class="scrub"><span id="scrub"></span></div>
+    </section>
+
+    <aside class="rail">
+      <div>
+        <h2>Behaviour</h2>
+        <div class="chips" id="chips-behaviour"></div>
+      </div>
+      <div>
+        <h2>Expressions</h2>
+        <div class="chips" id="chips-emotion"></div>
+      </div>
+    </aside>
+  </main>
+
+  <dl class="specs">
+    <div class="spec"><dt>Panel</dt><dd>128 &times; 64</dd></div>
+    <div class="spec"><dt>Frame</dt><dd>1024 B</dd></div>
+    <div class="spec"><dt>I2C</dt><dd>800 kHz</dd></div>
+    <div class="spec"><dt>Push</dt><dd>~13 ms</dd></div>
+    <div class="spec"><dt>Wires</dt><dd>4</dd></div>
+  </dl>
+
+  <section class="notes">
+    <p><strong>Left alone</strong> is the autonomous loop: it picks its own
+      moods, blinks in clusters, glances around the room and drifts a few
+      pixels to keep from burning into the panel. <strong>Poked</strong> is the
+      onboard BOOT button. <strong>Falling asleep</strong> is what five ignored
+      minutes look like.</p>
+    <p>Each expression clip starts from neutral, so you can see the trick that
+      does most of the work: the change is hidden behind a blink. The lids
+      shut, the shape swaps, the lids open.</p>
+    <p><span class="kbd">space</span> play/pause &middot;
+      <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> previous
+      and next clip.</p>
+  </section>
+</div>
+
+<script>
+  const DATA = {
+    cols: 32, fw: 128, fh: 64,
+    clips: [
+      { id: "auto", label: "Left alone", start: 0, count: 780, group: "b" },
+      { id: "poke", label: "Poked", start: 780, count: 110, group: "b" },
+      { id: "doze", label: "Falling asleep", start: 890, count: 150, group: "b" },
+      { id: "neutral", label: "Neutral", start: 1040, count: 45, group: "e" },
+      { id: "happy", label: "Happy", start: 1085, count: 45, group: "e" },
+      { id: "excited", label: "Excited", start: 1130, count: 45, group: "e" },
+      { id: "sad", label: "Sad", start: 1175, count: 45, group: "e" },
+      { id: "angry", label: "Angry", start: 1220, count: 45, group: "e" },
+      { id: "surprised", label: "Surprised", start: 1265, count: 45, group: "e" },
+      { id: "sleepy", label: "Sleepy", start: 1310, count: 45, group: "e" },
+      { id: "love", label: "Love", start: 1355, count: 45, group: "e" },
+      { id: "curious", label: "Curious", start: 1400, count: 45, group: "e" },
+      { id: "suspicious", label: "Suspicious", start: 1445, count: 45, group: "e" },
+      { id: "dizzy", label: "Dizzy", start: 1490, count: 45, group: "e" },
+      { id: "bored", label: "Bored", start: 1535, count: 45, group: "e" }
+    ]
+  };
+
+  const screen = document.getElementById("screen");
+  const bloom = document.getElementById("bloom");
+  const ctx = screen.getContext("2d");
+  const bctx = bloom.getContext("2d");
+  const playBtn = document.getElementById("play");
+  const speedBtn = document.getElementById("speed");
+  const readout = document.getElementById("readout");
+  const scrub = document.getElementById("scrub");
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const PIXEL = getComputedStyle(document.documentElement)
+    .getPropertyValue("--pixel").trim() || "#dff2ff";
+
+  let clip = DATA.clips[0];
+  let frame = 0;
+  let playing = !reduced;
+  let speed = 1;
+  let sheetReady = false;
+  let last = 0;
+  let acc = 0;
+
+  const sheet = new Image();
+  sheet.src = "sheet.png";
+  sheet.onload = () => { sheetReady = true; render(); };
+
+  function buildChips(containerId, group) {
+    const host = document.getElementById(containerId);
+    DATA.clips.filter(c => c.group === group).forEach(c => {
+      const b = document.createElement("button");
+      b.className = "chip";
+      b.id = "chip-" + c.id;
+      b.type = "button";
+      b.textContent = c.label;
+      b.setAttribute("aria-pressed", String(c === clip));
+      b.addEventListener("click", () => select(c, true));
+      host.appendChild(b);
+    });
+  }
+
+  function select(c, autoplay) {
+    clip = c;
+    frame = 0;
+    acc = 0;
+    document.querySelectorAll(".chip").forEach(el => {
+      el.setAttribute("aria-pressed", String(el.id === "chip-" + c.id));
+    });
+    if (autoplay && !playing) setPlaying(true);
+    render();
+  }
+
+  function setPlaying(v) {
+    playing = v;
+    playBtn.textContent = v ? "Pause" : "Play";
+    playBtn.setAttribute("aria-pressed", String(v));
+  }
+
+  function paint(c, index) {
+    const sx = (index % DATA.cols) * DATA.fw;
+    const sy = Math.floor(index / DATA.cols) * DATA.fh;
+    c.globalCompositeOperation = "source-over";
+    c.fillStyle = "#000";
+    c.fillRect(0, 0, DATA.fw, DATA.fh);
+    c.imageSmoothingEnabled = false;
+    c.drawImage(sheet, sx, sy, DATA.fw, DATA.fh, 0, 0, DATA.fw, DATA.fh);
+    // Multiply a cool white over it: lit pixels take the tint, black stays black.
+    c.globalCompositeOperation = "multiply";
+    c.fillStyle = PIXEL;
+    c.fillRect(0, 0, DATA.fw, DATA.fh);
+    c.globalCompositeOperation = "source-over";
+  }
+
+  function render() {
+    if (!sheetReady) return;
+    const index = clip.start + frame;
+    paint(ctx, index);
+    paint(bctx, index);
+    readout.textContent = "frame " + String(frame + 1).padStart(3, "0") +
+      " / " + clip.count;
+    scrub.style.width = ((frame + 1) / clip.count * 100).toFixed(2) + "%";
+  }
+
+  function tick(ts) {
+    requestAnimationFrame(tick);
+    if (!last) last = ts;
+    const dt = Math.min(ts - last, 250);
+    last = ts;
+    if (!playing || !sheetReady) return;
+    acc += dt * speed;
+    const step = 1000 / 30;
+    let advanced = false;
+    while (acc >= step) {
+      acc -= step;
+      frame = (frame + 1) % clip.count;
+      advanced = true;
+    }
+    if (advanced) render();
+  }
+
+  playBtn.addEventListener("click", () => setPlaying(!playing));
+
+  speedBtn.addEventListener("click", () => {
+    speed = speed === 1 ? 0.5 : 1;
+    speedBtn.textContent = (speed === 1 ? "1" : "0.5") + "× speed";
+    speedBtn.setAttribute("aria-pressed", String(speed !== 1));
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.target.tagName === "BUTTON" && e.key === " ") return;
+    if (e.key === " ") { e.preventDefault(); setPlaying(!playing); }
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      const i = DATA.clips.indexOf(clip);
+      const n = DATA.clips.length;
+      select(DATA.clips[(i + (e.key === "ArrowRight" ? 1 : n - 1)) % n], false);
+    }
+  });
+
+  buildChips("chips-behaviour", "b");
+  buildChips("chips-emotion", "e");
+  setPlaying(playing);
+  requestAnimationFrame(tick);
+</script>

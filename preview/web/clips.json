@@ -1,0 +1,98 @@
+{
+ "frameW": 128,
+ "frameH": 64,
+ "cols": 32,
+ "total": 1580,
+ "clips": [
+  {
+   "id": "auto",
+   "label": "Left alone",
+   "start": 0,
+   "count": 780
+  },
+  {
+   "id": "poke",
+   "label": "Poked",
+   "start": 780,
+   "count": 110
+  },
+  {
+   "id": "doze",
+   "label": "Falling asleep",
+   "start": 890,
+   "count": 150
+  },
+  {
+   "id": "neutral",
+   "label": "Neutral",
+   "start": 1040,
+   "count": 45
+  },
+  {
+   "id": "happy",
+   "label": "Happy",
+   "start": 1085,
+   "count": 45
+  },
+  {
+   "id": "excited",
+   "label": "Excited",
+   "start": 1130,
+   "count": 45
+  },
+  {
+   "id": "sad",
+   "label": "Sad",
+   "start": 1175,
+   "count": 45
+  },
+  {
+   "id": "angry",
+   "label": "Angry",
+   "start": 1220,
+   "count": 45
+  },
+  {
+   "id": "surprised",
+   "label": "Surprised",
+   "start": 1265,
+   "count": 45
+  },
+  {
+   "id": "sleepy",
+   "label": "Sleepy",
+   "start": 1310,
+   "count": 45
+  },
+  {
+   "id": "love",
+   "label": "Love",
+   "start": 1355,
+   "count": 45
+  },
+  {
+   "id": "curious",
+   "label": "Curious",
+   "start": 1400,
+   "count": 45
+  },
+  {
+   "id": "suspicious",
+   "label": "Suspicious",
+   "start": 1445,
+   "count": 45
+  },
+  {
+   "id": "dizzy",
+   "label": "Dizzy",
+   "start": 1490,
+   "count": 45
+  },
+  {
+   "id": "bored",
+   "label": "Bored",
+   "start": 1535,
+   "count": 45
+  }
+ ]
+}
