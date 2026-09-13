@@ -1,0 +1,10 @@
+# Wokwi simulator config (https://docs.wokwi.com/vscode/getting-started).
+# Build with `pio run` first, then hit "Start Simulation" on sim/diagram.json.
+#
+# Paths are relative to the project root, so copy both files up one level, or
+# open the project with wokwi-cli pointing at this directory:
+#   wokwi-cli --config sim/wokwi.toml .
+[wokwi]
+version = 1
+firmware = '.pio/build/esp32-c3-supermini/firmware.bin'
+elf = '.pio/build/esp32-c3-supermini/firmware.elf'
