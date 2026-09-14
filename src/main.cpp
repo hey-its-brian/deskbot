@@ -196,7 +196,7 @@ static void printHelp(Print& out) {
   out.println(F("  weather refresh  fetch it again"));
   out.println(F("  set <key> <val>  bored sleep brightness drift weather lat lon"));
   out.println(F("                   units interval glance   (saved to flash)"));
-  out.println(F("  net              wifi state"));
+  out.println(F("  net              wifi state; 'net scan' lists networks in range"));
   out.println(F("  status"));
 }
 
@@ -292,9 +292,13 @@ void runCommand(char* line, Print& out) {
     if (!arg || !val || !*val) out.println(F("usage: set <key> <value>"));
     else setSetting(arg, val, out);
   } else if (!strcmp(line, "net")) {
-    if (!net::enabled()) out.println(F("wifi: off (no src/secrets.h)"));
-    else if (!net::up()) out.println(F("wifi: connecting"));
-    else {
+    if (arg && !strcmp(arg, "scan")) net::scan(out);
+    else if (!net::enabled()) out.println(F("wifi: off (no src/secrets.h)"));
+    else if (!net::up()) {
+      out.print(F("wifi: connecting to " DB_WIFI_SSID));
+      if (net::lastFailure()[0]) { out.print(F(" - last failure: ")); out.print(net::lastFailure()); }
+      out.println();
+    } else {
       out.print(F("wifi: http://")); out.print(net::hostname()); out.print(F(".local  "));
       out.print(net::ip()); out.print(F("  ")); out.print(net::rssi()); out.println(F(" dBm"));
     }

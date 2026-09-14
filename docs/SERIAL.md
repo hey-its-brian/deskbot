@@ -31,7 +31,8 @@ echo "happy" > /dev/ttyACM0              # Linux
 | `weather` | show the current weather now |
 | `weather refresh` | fetch it again |
 | `set <key> <value>` | change a setting and save it: `bored`, `sleep`, `brightness`, `drift`, `weather`, `lat`, `lon`, `units`, `interval`, `glance` |
-| `net` | WiFi state and address |
+| `net` | WiFi state and address, or why the last attempt failed |
+| `net scan` | list every network in range: channel, signal, security |
 | `status` | version, emotion, idle time, I2C address, IP, last weather |
 
 The same commands work over the network - `POST /api/cmd` with `c=<command>`;
