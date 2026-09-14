@@ -19,7 +19,7 @@ emotion, each filling in a `Pose`:
 | `tilt` | pixels; left eye down, right eye up. Reads as a head tilt |
 | `scaleL`, `scaleR` | per-eye size multiplier. Asymmetry reads as curiosity |
 | `gazeX`, `gazeY` | resting gaze, `-1..1` |
-| `pupil` | `0..1` pupil size. It sits in whatever band of the eye the lids leave visible and slides with the gaze; `0` for a solid glare (angry) |
+| `pupil` | `0..1` pupil size, **0 by default** - the EMO look is solid eyes. Set it and a pupil appears in whatever band of the eye the lids leave visible, sliding with the gaze |
 | `bob` | idle breathing amplitude in pixels |
 | `style` | `STYLE_EYES`, `STYLE_HEART` or `STYLE_SPIRAL` |
 

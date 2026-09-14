@@ -160,8 +160,7 @@ void Personality::onTap() {
     return;
   }
   tapAgo_ = 0.0f;
-  face_->look(0.0f, 0.0f, 1.6f);    // "oh, hi"
-  face_->wink(rng_.chance(0.5f));
+  face_->look(0.0f, 0.0f, 1.6f);    // "oh, hi": notices you, brightens up
   face_->flash(EMOTION_HAPPY, 2.2f, EMOTION_NEUTRAL);
   moodT_ = 3.0f;
 }
