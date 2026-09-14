@@ -2,6 +2,7 @@
 #
 #   make preview   render the face on this machine into preview/*.png
 #   make gif       render the README animation into preview/deskbuddy.gif
+#   make case      export hardware/case/*.stl (needs openscad on PATH)
 #   make build     compile the firmware   (pio run)
 #   make flash     compile + upload       (pio run -t upload)
 #   make monitor   open the serial console
@@ -13,7 +14,7 @@ HOST_FLAGS = -std=c++14 -O2 -Wall -DDESKBUDDY_HOST=1 -Isrc -Itools/host
 EMOTIONS = neutral happy excited sad angry surprised sleepy love curious \
            suspicious dizzy bored
 
-.PHONY: preview gif build flash monitor clean
+.PHONY: preview gif case build flash monitor clean
 
 preview/preview: $(HOST_SRC) tools/host/HostGfx.h src/Face.h
 	@mkdir -p preview
@@ -30,6 +31,10 @@ preview: preview/preview
 
 gif: preview/preview
 	python3 tools/host/make_gif.py preview/deskbuddy.gif
+
+case:
+	cd hardware/case && openscad -o bezel.stl -D 'part="bezel"' deskbuddy_case.scad
+	cd hardware/case && openscad -o shell.stl -D 'part="shell"' deskbuddy_case.scad
 
 build:
 	pio run

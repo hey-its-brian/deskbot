@@ -4,8 +4,13 @@
 a **shell** behind it - a closed box, 35 mm deep, the exact outline of the
 face, leaning back 12 degrees. The Super Mini lies on a shelf inside with its
 USB-C port through the back wall; the touch pad tapes to the inside of the
-top. From the front, nothing shows but the face. Four M2x8 self-tapping
-screws hold it together, heads countersunk in the bezel.
+top. From the front, nothing shows but the face. Four **M2x10** self-tapping
+screws hold it together, heads countersunk in the bezel (x8 only bites
+3-4 mm of post through the 5.7 mm bezel; x10 gets a proper grip).
+
+![Assembly](assembly.png)
+
+![Cut away](section.png)
 
 ```
         side view                         inside, from the front
@@ -75,4 +80,6 @@ openscad -o shell.stl -D 'part="shell"' deskbuddy_case.scad
 ```
 
 Opening the file with `part = "both"` shows the assembly standing on the desk
-as it will sit.
+as it will sit; add `section = true` to cut the right half away and see
+inside. `make case` from the repo root exports both STLs if `openscad` is on
+your PATH.
