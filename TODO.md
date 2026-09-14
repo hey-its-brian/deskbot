@@ -79,6 +79,33 @@ real "hey buddy":
 
 Start with detection. If it's still fun, do route 2.
 
+## Phone alerts over Bluetooth - the "buzzing" face
+
+Pair it with the phone and have it shake when a notification comes in.
+
+**iPhone: ANCS.** Apple Notification Center Service is how smartwatches get
+notifications - the phone is the server, the buddy is a BLE peripheral that
+subscribes. Pair once in Settings > Bluetooth and iOS pushes every alert
+(app, title, a snippet) with nothing installed on the phone. The C3 has BLE
+5.0; use NimBLE-Arduino and an ANCS client (there are working ESP32 ANCS
+examples to start from). WiFi and BLE share the radio on the C3 - it works,
+but keep BLE connection intervals relaxed so the web app stays responsive.
+
+**Android** has no ANCS equivalent. Two routes: a small companion app
+(BLE notification listener - Gadgetbridge-style), or skip Bluetooth and use
+the `/api/notify` endpoint from a phone automation app (MacroDroid,
+Tasker) over WiFi, which already works today.
+
+**The face.** `Face::buzz(seconds)`: a sustained, small-amplitude, high
+frequency shake - the startle `jolt()` is a damped version of exactly this -
+with wide eyes, plus a little phone/bell glyph in the corner and maybe a
+FX_STAR "ring" ripple. Different apps could get different faces later
+(messages -> happy, calendar -> surprised, a call -> the buzz until answered).
+Quiet hours should silence it.
+
+**Also possible once paired:** the phone's presence as a "you're home"
+signal, and phone battery on the face if you like that sort of thing.
+
 ## Suggested
 
 - **Bambu P1S print watcher.** The P1S in LAN-only mode publishes MQTT
