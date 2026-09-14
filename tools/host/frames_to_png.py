@@ -88,10 +88,12 @@ def main():
     cols, scale, labels = 4, 3, []
     args = sys.argv[3:]
     for i, a in enumerate(args):
+        if i + 1 >= len(args):
+            break
         if a == "--cols":
-            cols = int(args[i + 1])
+            cols = max(1, int(args[i + 1]))
         elif a == "--scale":
-            scale = int(args[i + 1])
+            scale = max(1, int(args[i + 1]))
         elif a == "--labels":
             labels = args[i + 1].split(",")
 

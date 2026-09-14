@@ -12,6 +12,7 @@ void Effects::clear() {
 
 void Effects::spawn(FxType type, float x, float y, float vx, float vy,
                     float life, float size) {
+  if (!(life > 0.0f)) return;  // age/life is divided later; also rejects NaN
   int slot = -1;
   float oldest = -1.0f;
   for (int i = 0; i < MAX_PARTICLES; ++i) {

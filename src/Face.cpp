@@ -192,6 +192,10 @@ void Face::wink(bool leftEye) {
 }
 
 void Face::look(float x, float y, float holdSeconds) {
+  // `look nan 0` over serial parses fine and a NaN never leaves a clamp or the
+  // smoothed gaze again, so the face would be stuck off-screen until a reboot.
+  if (x != x) x = 0.0f;
+  if (y != y) y = 0.0f;
   gazeTX_ = clampf(x, -1.0f, 1.0f);
   gazeTY_ = clampf(y, -1.0f, 1.0f);
   gazeHold_ = holdSeconds;
@@ -249,7 +253,8 @@ void Face::spawnMoodEffects(float dt) {
 void Face::update(float dt) {
   if (dt > 0.1f) dt = 0.1f;  // a hiccup shouldn't fling the animation forward
   if (dt < 0.0f) dt = 0.0f;
-  t_ += dt;
+  driftA_ += dt * 0.0647f;  if (driftA_ > 6.2832f) driftA_ -= 6.2832f;
+  driftB_ += dt * 0.0413f;  if (driftB_ > 6.2832f) driftB_ -= 6.2832f;
 
   breathe_ += dt * 1.9f;  if (breathe_ > 6.2832f) breathe_ -= 6.2832f;
   beat_    += dt * 5.2f;  if (beat_    > 6.2832f) beat_    -= 6.2832f;
@@ -439,8 +444,8 @@ void Face::draw(Canvas& g) {
   // the panel. Two incommensurate periods => it never repeats exactly.
   float dx = 0.0f, dy = 0.0f;
   if (drift_) {
-    dx = sinf(t_ * 0.0647f) * 3.0f;
-    dy = cosf(t_ * 0.0413f) * 2.0f;
+    dx = sinf(driftA_) * 3.0f;
+    dy = cosf(driftB_) * 2.0f;
   }
 
   float shakeX = 0.0f, shakeY = 0.0f;

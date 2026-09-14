@@ -52,7 +52,7 @@ def main():
 
     add("auto", "Left alone", run(["anim", "26"], tmp))
     add("poke", "Poked", run(["poke", "110"], tmp))
-    add("pet", "Petted", run(["pet", "150"], tmp))
+    add("pet", "Petted", run(["pet", "170"], tmp))
     add("doze", "Falling asleep", run(["doze", "150"], tmp))
     for e in EMOTIONS:
         add(e, e.capitalize(), run(["arc", e], tmp))

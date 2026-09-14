@@ -130,7 +130,7 @@ on the board also runs on your machine:
 
 ```sh
 make preview        # preview/emotions.png and preview/timeline.png
-make gif            # preview/deskbuddy.gif, the animation at the top
+make gif            # preview/deskbuddy.gif, the animation at the top (needs: pip3 install pillow)
 ```
 
 `preview/preview arc angry out.bin` renders a single transition frame by

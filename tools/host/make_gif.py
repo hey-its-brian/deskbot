@@ -40,7 +40,7 @@ GREY = (58, 58, 58)
 CLIPS = [
     (["anim", "8"], 30, 120),      # left alone: gazes around, blinks, changes mood
     (["poke", "110"], 0, 84),      # poked at frame 12: startle, then cheer up
-    (["pet", "150"], 0, 126),      # petted: squints up, hearts, then let go
+    (["pet", "170"], 0, 160),      # petted: squints up, hearts, heart-eyes, let go
     (["arc", "angry"], 0, 45),
     (["arc", "sad"], 0, 45),
     (["arc", "dizzy"], 0, 45),

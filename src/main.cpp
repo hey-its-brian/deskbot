@@ -14,14 +14,21 @@
 #include "Personality.h"
 #include "config.h"
 
-static Adafruit_SSD1306 display(DB_SCREEN_W, DB_SCREEN_H, &Wire, -1);
+// The library re-applies its own bus clock around every transaction, so the
+// speed has to go in here - a Wire.setClock() in setup() would be overridden.
+static Adafruit_SSD1306 display(DB_SCREEN_W, DB_SCREEN_H, &Wire, -1,
+                                DB_I2C_CLOCK, DB_I2C_CLOCK);
 static db::Face face;
 static db::Personality brain;
 static Button button(DB_PIN_BUTTON, DB_BUTTON_ACTIVE_LOW);
 static Button touch(DB_PIN_TOUCH, !DB_TOUCH_ACTIVE_HIGH);
 
 // `pet` / `tap` over serial pretend a finger is on the pad until this time.
+// The deadline is only ever compared while the pretend touch is live: an
+// unsigned millis() difference flips sign after 24.9 days of uptime, and a
+// bare `until > now` test would hallucinate a finger for the next 24.9 days.
 static uint32_t simTouchUntil = 0;
+static bool simTouching = false;
 
 static uint8_t oledAddress = 0x3C;
 static bool displayReady = false;
@@ -144,8 +151,10 @@ static void runCommand(char* line) {
     brain.onInteraction(db::TOUCH_POKE);
   } else if (!strcmp(line, "tap")) {
     simTouchUntil = millis() + 120;
+    simTouching = true;
   } else if (!strcmp(line, "pet")) {
     simTouchUntil = millis() + 3500;
+    simTouching = true;
   } else if (!strcmp(line, "sleep")) {
     brain.sleep();
   } else if (!strcmp(line, "wake")) {
@@ -160,13 +169,20 @@ static void runCommand(char* line) {
     Serial.print(F(" idle=")); Serial.print(brain.idleSeconds(), 1);
     Serial.print(F("s oled=0x")); Serial.println(oledAddress, HEX);
   } else {
-    Serial.print(F("? ")); Serial.print(line);
+    // Echo only printable ASCII: this goes straight back into whatever
+    // terminal is attached, and a stray escape sequence could redraw it.
+    Serial.print(F("? "));
+    for (const char* c = line; *c; ++c) {
+      if (*c >= 0x20 && *c < 0x7F) Serial.print(*c);
+    }
     Serial.println(F("  (try 'help')"));
   }
 }
 
 static void pollSerial() {
-  while (Serial.available()) {
+  // A host that floods the port must not be able to stall the frame loop.
+  uint8_t budget = 64;
+  while (Serial.available() && budget--) {
     const char c = (char)Serial.read();
     if (c == '\r') continue;
     if (c == '\n') {
@@ -234,6 +250,20 @@ void loop() {
     return;
   }
 
+  // Ask the panel if it is still there now and then, so an unplugged or
+  // glitched OLED goes back through the retry path instead of being fed
+  // frames forever.
+  static uint32_t lastProbe = 0;
+  if (millis() - lastProbe > 2000) {
+    lastProbe = millis();
+    Wire.beginTransmission(oledAddress);
+    if (Wire.endTransmission() != 0) {
+      displayReady = false;
+      Serial.println(F("lost the SSD1306 - will retry"));
+      return;
+    }
+  }
+
   static uint32_t prevUs = micros();
   const uint32_t nowUs = micros();
   float dt = (float)(uint32_t)(nowUs - prevUs) * 1e-6f;
@@ -249,7 +279,8 @@ void loop() {
   if (button.takeLong())   brain.onInteraction(db::TOUCH_HOLD);
 
   touch.update(millis());
-  brain.setTouch(touch.isDown() || (int32_t)(simTouchUntil - millis()) > 0, dt);
+  if (simTouching && (int32_t)(simTouchUntil - millis()) <= 0) simTouching = false;
+  brain.setTouch(touch.isDown() || simTouching, dt);
 
   brain.update(dt);
   face.update(dt);

@@ -76,7 +76,7 @@ void Personality::wake(bool startled) {
 
 void Personality::update(float dt) {
   if (!face_) return;
-  idle_ += dt;
+  if (idle_ < 1.0e6f) idle_ += dt;  // only ever compared against thresholds
 
   // Attention fades slowly.
   energy_ = approach(energy_, idle_ > DB_IDLE_BORED_S ? 0.25f : 0.55f, 30.0f, dt);

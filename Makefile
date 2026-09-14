@@ -41,4 +41,4 @@ monitor:
 	pio device monitor
 
 clean:
-	rm -rf preview .pio
+	rm -rf .pio preview/preview preview/*.bin preview/timeline.png

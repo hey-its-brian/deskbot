@@ -125,7 +125,8 @@ class Face {
   float spin_ = 0.0f;      // spiral phase
   float beat_ = 0.0f;      // heart beat phase
   float breathe_ = 0.0f;   // idle bob phase
-  float t_ = 0.0f;         // seconds since boot
+  float driftA_ = 0.0f;    // burn-in wander phases (wrapped, so they never
+  float driftB_ = 0.0f;    // lose precision on a long uptime)
   float fxTimer_ = 0.0f;
   bool drift_ = true;
 

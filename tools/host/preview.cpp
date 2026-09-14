@@ -77,7 +77,10 @@ int main(int argc, char** argv) {
     frames = 45;
     fclose(out);
   } else if (strcmp(mode, "anim") == 0 && argc >= 4) {
-    const float seconds = (float)atof(argv[2]);
+    // argv is untrusted enough: a huge or NaN duration makes the cast to int
+    // below undefined, so pin it to something a preview could plausibly want.
+    const float wanted = (float)atof(argv[2]);
+    const float seconds = (wanted > 0.0f) ? ((wanted < 3600.0f) ? wanted : 3600.0f) : 0.0f;
     FILE* out = fopen(argv[3], "wb");
     if (!out) return 1;
     Face face;
@@ -112,7 +115,8 @@ int main(int argc, char** argv) {
     frames = n;
     fclose(out);
   } else if (strcmp(mode, "pet") == 0 && argc >= 4) {
-    // Finger lands on the pad at frame 12 and stays for three seconds.
+    // Finger lands on the pad at frame 12 and stays 3.5 s: long enough to
+    // pass the 2.8 s heart-eyes threshold and let the blink reveal them.
     const int n = atoi(argv[2]);
     FILE* out = fopen(argv[3], "wb");
     if (!out) return 1;
@@ -121,7 +125,7 @@ int main(int argc, char** argv) {
     face.begin(0x9E7u);
     brain.begin(face, 0x9E7u);
     for (int i = 0; i < n; ++i) {
-      brain.setTouch(i >= 12 && i < 12 + 90, kDt);
+      brain.setTouch(i >= 12 && i < 12 + 105, kDt);
       brain.update(kDt);
       face.update(kDt);
       face.draw(g);
