@@ -1,37 +1,41 @@
 # Desk Buddy
 
+![Desk Buddy looking around, getting poked, getting petted](preview/deskbuddy.gif)
+
 An EMO-style animated face for an **ESP32-C3 Super Mini** and a **0.96"
 SSD1306 OLED**. Two parts, four wires, and a little robot that sits on your
 desk, looks around the room, gets bored of you, and falls asleep if you ignore
 it for five minutes.
 
-![Every expression](preview/emotions.png)
-
 It is eyes only, on purpose - that is most of what makes EMO read as a
 character rather than a cartoon. No mouth to get wrong.
 
-## What it actually does
+## What it does
 
-- **Twelve expressions**, each easing smoothly into the next: neutral, happy,
-  excited, sad, angry, surprised, sleepy, love, curious, suspicious, dizzy,
-  bored.
-- **Blinks like a living thing** - fast close, slower open, random intervals,
-  and an occasional quick double-blink, because real blinks come in clusters.
-- **Expression changes hide behind a blink.** The lids shut, the shape swaps,
-  the lids open. This one trick is why it doesn't look like a slideshow.
-- **Looks around on its own** - saccades to random points, with a standing
-  chance of glancing back at whoever is sitting in front of it.
-- **Breathes.** A sub-pixel idle bob, so it is never completely still.
-- **Has opinions.** A weighted mood engine picks what to feel next: mostly
-  calm, occasionally dramatic. Ignored for 90 seconds and it gets visibly
-  bored; five minutes and it nods off and the panel dims.
-- **Reacts to being poked** - startle, shake, then cheer up. **And to being
-  petted** - a capacitive pad under the case top makes the whole head touch
-  sensitive: tap to say hi, hold to pet, hold long enough and it melts.
-- **Little flourishes**: floating Z's while asleep, hearts, a nervous sweat
-  drop, exclamation marks, tears, spiral eyes when dizzy.
-- **Anti burn-in drift**, because a bright static face on an OLED all day is
-  exactly how you etch a panel.
+Twelve expressions - neutral, happy, excited, sad, angry, surprised, sleepy,
+love, curious, suspicious, dizzy, bored - and it eases between them instead of
+cutting. Every change hides behind a blink: the lids shut, the shape swaps,
+the lids open. That single trick is most of why it reads as alive rather than
+as a slideshow.
+
+![The twelve expressions](preview/emotions.png)
+
+Left alone, it runs itself. A weighted mood table picks what to feel next
+(mostly calm, with the occasional bit of drama) while the eyes saccade to
+random points, with a standing chance of glancing back at whoever is sitting
+in front of them. Blinks close fast and open slow at random intervals, and
+sometimes come in quick pairs, because real ones do. A sub-pixel idle bob
+keeps it from ever being completely still. Ignore it for 90 seconds and it
+gets visibly bored; five minutes and it nods off and the panel dims.
+
+Interrupt it and it notices. A poke startles it - shake, exclamation marks,
+then it cheers up. A pat makes it squint up at your hand and throw hearts, and
+if you keep going for about three seconds it is smitten. There are floating
+Z's while it sleeps, tears when it is sad, a nervous sweat drop, and spiral
+eyes when it is dizzy.
+
+The whole face also wanders a few pixels on two slow periods that never line
+up. A bright static image on an OLED all day is exactly how you etch a panel.
 
 ## Parts
 
@@ -43,8 +47,7 @@ character rather than a cartoon. No mouth to get wrong.
 | USB-C cable | |
 
 Optional: a TTP223-style capacitive touch pad (one wire, and it becomes the
-buddy's head - see below), a printed case (`hardware/case/`) and four M2x8
-screws.
+buddy's head), a printed case (`hardware/case/`) and four M2x8 screws.
 
 ## Wiring
 
@@ -55,25 +58,27 @@ screws.
 | SDA | GPIO5 |
 | SCL | GPIO6 |
 
-That's it. The **onboard BOOT button** (GPIO9) is the "poke me" button, so
-there is nothing else to wire.
+That is the whole build. The **onboard BOOT button** (GPIO9) is the "poke me"
+button, so there is nothing else to wire.
 
-Have a touch sensor? `VCC -> 3V3`, `GND -> GND`, `SIG -> GPIO4`. A poke and a
-pat get different reactions. Full notes, including why not the default I2C
-pins, are in [docs/WIRING.md](docs/WIRING.md).
+Have a touch sensor? `VCC -> 3V3`, `GND -> GND`, `SIG -> GPIO4`. Stick the pad
+inside the top of the case and the head becomes touch sensitive with nothing
+visible from outside.
 
-## Flash it
+[docs/WIRING.md](docs/WIRING.md) has the rest: why not the default I2C pins,
+which TTP223 solder jumpers to leave alone, what to do when the panel glitches.
 
-### PlatformIO (recommended)
+## Flashing it
+
+### PlatformIO
 
 ```sh
 pio run -t upload      # or: make flash
 pio device monitor     # or: make monitor
 ```
 
-Libraries and the toolchain are pulled in automatically by
-`platformio.ini`. The Super Mini shows up as a native USB CDC port - no
-drivers, no BOOT-button dance.
+`platformio.ini` pulls in the libraries and the toolchain. The Super Mini
+shows up as a native USB CDC port - no drivers, no BOOT-button dance.
 
 ### Arduino IDE
 
@@ -101,7 +106,9 @@ drivers, no BOOT-button dance.
 
 A pat wakes it gently; a poke wakes it startled.
 
-Or drive it over USB serial at 115200 - `help` lists everything:
+## Driving it over serial
+
+115200 baud on the same USB port, line-based, `help` lists everything:
 
 ```
 > happy
@@ -110,23 +117,27 @@ Or drive it over USB serial at 115200 - `help` lists everything:
 > auto on
 ```
 
-Handy for wiring it into something else: a failing build can make it angry, a
-green one can make it happy. See [docs/SERIAL.md](docs/SERIAL.md).
+Naming an emotion takes the buddy off autopilot so your expression sticks;
+`auto on` gives it its own head back. Anything that can write to a tty can
+drive it, which makes it easy to wire into something else - a failing build
+can make it angry, a green one can make it happy. Full command list in
+[docs/SERIAL.md](docs/SERIAL.md).
 
 ## Seeing it before you solder anything
 
-The face renderer is deliberately free of any Arduino dependency, so the exact
-same code that runs on the board also runs on your Mac:
+The face renderer has no Arduino dependency, so the exact same code that runs
+on the board also runs on your machine:
 
 ```sh
-make preview        # writes preview/emotions.png and preview/timeline.png
+make preview        # preview/emotions.png and preview/timeline.png
+make gif            # preview/deskbuddy.gif, the animation at the top
 ```
 
 `preview/preview arc angry out.bin` renders a single transition frame by
 frame, which is the fastest way to judge a tweak.
 
-`preview/web/index.html` is a small browser player for the same frames - open
-it locally, or regenerate it after a change with:
+`preview/web/index.html` is a small browser player for the same frames. Open
+it locally, or regenerate it after a change:
 
 ```sh
 python3 tools/host/make_web_preview.py preview/web
@@ -148,7 +159,7 @@ src/
   Button.*         debounce, single / double / long press
   Easing.h         smoothing helpers and a deterministic RNG
   Gfx.h            one drawing surface, two backends (device / host preview)
-tools/host/        the desktop renderer and a stdlib-only PNG writer
+tools/host/        the desktop renderer, a stdlib-only PNG writer, the GIF script
 hardware/case/     parametric OpenSCAD case
 docs/              wiring, serial protocol, tuning
 ```
@@ -157,18 +168,39 @@ An eye is one white rounded rectangle that then gets **carved**: a top lid
 (slanted, which is what reads as an eyebrow), a bottom lid, and a circular
 bite out of the bottom that turns it into a smiling arch. The carving is done
 column by column rather than with polygons, so there are no seams and no
-overdraw. Everything is driven by a `Pose` struct that the renderer eases
-towards every frame - see [docs/TUNING.md](docs/TUNING.md) to add your own
-expressions.
+overdraw.
+
+Everything visual is data. A `Pose` struct holds the eye size, lids, slant,
+arc, tilt, gaze and the rest, and the renderer eases the live pose towards the
+target every frame - so adding an expression means adding a row to a table,
+not touching the renderer. [docs/TUNING.md](docs/TUNING.md) walks through
+every field, plus blink feel and the boredom and sleep timings.
 
 Frames are pushed at 30 fps over I2C at 800 kHz. A 128x64 frame is 1024 bytes,
 so a push costs ~13 ms; at the more usual 400 kHz you would be stuck at about
 half the frame rate.
 
+## The case
+
+`hardware/case/` has a parametric two-part OpenSCAD case: a bezel the OLED
+drops into, and a shell that leans the face back about 14 degrees and holds
+the Super Mini. Four M2x8 self-tapping screws hold it together, and the touch
+pad tapes to the inside of the top wall.
+
+It is untested on a printer, and 0.96" OLED modules vary by a millimetre
+between batches, so put calipers on yours and check the dimensions first.
+Measurements, print settings and the STL export commands are in
+[hardware/case/README.md](hardware/case/README.md). Black filament makes the
+bezel disappear around the display, which is most of the look.
+
 ## Status
 
-Written and checked on a machine without the hardware attached: the renderer
-output in `preview/` comes from the real `Face.cpp`, and the Arduino sources
-compile clean under `-Wall -Wextra`. It has not yet been run on a physical
-board - if the first flash misbehaves, `status` over serial and
+Written and checked on a machine without the hardware attached. Everything in
+`preview/` is rendered by the real `Face.cpp`. Every source file compiles
+clean under `-Wall -Wextra` - the Arduino-free half for real on the host, the
+Arduino half against stub headers - but the PlatformIO registry was blocked in
+the environment this was written in, so the firmware has never been through a
+full `pio run`, and it has never been flashed to a physical board.
+
+If the first flash misbehaves, `status` over serial and
 [docs/WIRING.md](docs/WIRING.md) are the places to start.

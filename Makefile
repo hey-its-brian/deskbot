@@ -1,6 +1,7 @@
 # Desk Buddy - helper targets.
 #
 #   make preview   render the face on this machine into preview/*.png
+#   make gif       render the README animation into preview/deskbuddy.gif
 #   make build     compile the firmware   (pio run)
 #   make flash     compile + upload       (pio run -t upload)
 #   make monitor   open the serial console
@@ -12,7 +13,7 @@ HOST_FLAGS = -std=c++14 -O2 -Wall -DDESKBUDDY_HOST=1 -Isrc -Itools/host
 EMOTIONS = neutral happy excited sad angry surprised sleepy love curious \
            suspicious dizzy bored
 
-.PHONY: preview build flash monitor clean
+.PHONY: preview gif build flash monitor clean
 
 preview/preview: $(HOST_SRC) tools/host/HostGfx.h src/Face.h
 	@mkdir -p preview
@@ -26,6 +27,9 @@ preview: preview/preview
 	python3 tools/host/frames_to_png.py preview/anim.bin preview/timeline.png \
 		--cols 12 --scale 1
 	@echo "open preview/emotions.png"
+
+gif: preview/preview
+	python3 tools/host/make_gif.py preview/deskbuddy.gif
 
 build:
 	pio run
