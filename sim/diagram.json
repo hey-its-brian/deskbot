@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "author": "desk buddy",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-c3-devkitm-1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "board-ssd1306", "id": "oled", "top": -110, "left": 120,
+      "attrs": { "i2cAddress": "0x3c" } },
+    { "type": "wokwi-pushbutton", "id": "btn", "top": 130, "left": 120,
+      "attrs": { "color": "green", "label": "poke" } }
+  ],
+  "connections": [
+    [ "esp:5", "oled:SDA", "green", [] ],
+    [ "esp:6", "oled:SCL", "yellow", [] ],
+    [ "esp:3V3", "oled:VCC", "red", [] ],
+    [ "esp:GND.1", "oled:GND", "black", [] ],
+    [ "esp:9", "btn:1.l", "blue", [] ],
+    [ "btn:2.l", "esp:GND.2", "black", [] ],
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ]
+  ],
+  "dependencies": {}
+}

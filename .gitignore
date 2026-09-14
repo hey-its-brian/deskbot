@@ -1,0 +1,6 @@
+.pio/
+preview/preview
+preview/*.bin
+preview/web/_tmp.bin
+*.stl
+.DS_Store
