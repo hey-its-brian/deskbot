@@ -4,6 +4,8 @@
 // ---------------------------------------------------------------------------
 #pragma once
 
+#define DB_VERSION "0.3.0"
+
 // --- I2C to the SSD1306 ----------------------------------------------------
 //
 // The ESP32-C3 can put I2C on almost any pin. GPIO5 / GPIO6 are chosen here
@@ -70,3 +72,52 @@
 
 // Serial control (see docs/SERIAL.md). Costs nothing when unused.
 #define DB_SERIAL_CONTROL 1
+
+// --- Network ---------------------------------------------------------------
+//
+// WiFi credentials, an optional OTA password and an optional web login live
+// in src/secrets.h, which is gitignored - copy src/secrets.example.h to get
+// started. No secrets.h means no networking; the face runs exactly as before.
+#if __has_include("secrets.h")
+#include "secrets.h"
+#endif
+#ifndef DB_WIFI_SSID
+#define DB_WIFI_SSID ""
+#endif
+#ifndef DB_WIFI_PASS
+#define DB_WIFI_PASS ""
+#endif
+#ifndef DB_OTA_PASSWORD
+#define DB_OTA_PASSWORD ""
+#endif
+#ifndef DB_WEB_USER
+#define DB_WEB_USER ""
+#endif
+#ifndef DB_WEB_PASSWORD
+#define DB_WEB_PASSWORD ""
+#endif
+#ifndef DB_WEATHER_LAT
+#define DB_WEATHER_LAT 0.0f
+#endif
+#ifndef DB_WEATHER_LON
+#define DB_WEATHER_LON 0.0f
+#endif
+
+// It answers at http://<DB_HOSTNAME>.local once it is on the network, and
+// that is also the OTA upload target.
+#define DB_HOSTNAME "deskbuddy"
+#define DB_WEB_PORT 80
+
+// WiFi modem sleep saves ~50 mA but adds a few hundred ms to every web and
+// OTA request. This is a desk object on a USB cable: default to snappy.
+#define DB_WIFI_POWER_SAVE 0
+
+// --- Weather ---------------------------------------------------------------
+//
+// Fetched from Open-Meteo (free, no key). All of these are starting values -
+// they can be changed from the web app and are then kept in flash.
+#define DB_WEATHER_ENABLED 1
+#define DB_WEATHER_UNITS 'F'          // 'C' or 'F'
+#define DB_WEATHER_INTERVAL_MIN 15    // how often to fetch
+#define DB_WEATHER_GLANCE_MIN 20      // how often to show it unprompted (0 = never)
+#define DB_WEATHER_SHOW_S 6.0f        // how long a glance lasts

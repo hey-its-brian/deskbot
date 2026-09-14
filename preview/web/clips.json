@@ -2,7 +2,7 @@
  "frameW": 128,
  "frameH": 64,
  "cols": 32,
- "total": 1750,
+ "total": 2650,
  "clips": [
   {
    "id": "auto",
@@ -99,6 +99,42 @@
    "label": "Bored",
    "start": 1705,
    "count": 45
+  },
+  {
+   "id": "wx-clear",
+   "label": "Sunny",
+   "start": 1750,
+   "count": 150
+  },
+  {
+   "id": "wx-clear-night",
+   "label": "Clear night",
+   "start": 1900,
+   "count": 150
+  },
+  {
+   "id": "wx-cloudy",
+   "label": "Overcast",
+   "start": 2050,
+   "count": 150
+  },
+  {
+   "id": "wx-rain",
+   "label": "Rain",
+   "start": 2200,
+   "count": 150
+  },
+  {
+   "id": "wx-snow",
+   "label": "Snow",
+   "start": 2350,
+   "count": 150
+  },
+  {
+   "id": "wx-storm",
+   "label": "Thunderstorm",
+   "start": 2500,
+   "count": 150
   }
  ]
 }

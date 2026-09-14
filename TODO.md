@@ -31,49 +31,26 @@ outward.
 `Personality::idleSeconds()`; a third `Button` instance per PIR gets the
 debouncing for free.
 
-## WiFi + web app
+## Upgrade to the XIAO ESP32-S3 Sense
 
-Settings and basic interaction from a phone or laptop, no USB.
+The board that unlocks the rest of this list: dual-core 240 MHz, 8 MB PSRAM,
+mic and camera on board, native USB-C. Same XIAO footprint as the C6 but
+nothing like it in capability.
 
-**Firmware.** The C3 has WiFi. Keep one control vocabulary: the serial
-parser in `src/main.cpp` (`runCommand()`) already understands `happy`,
-`look -1 0.3`, `pet`, `auto off`; a web endpoint should feed it the same
-strings rather than grow a second command set. `ESPAsyncWebServer` or the
-core `WebServer`, mDNS so it answers at `deskbuddy.local`, and a single
-static page served from PROGMEM - emotion buttons, poke / pet, auto on/off,
-sleep and boredom timings, panel brightness. Credentials in a gitignored
-`secrets.h`, or WiFiManager's captive portal for first-time setup.
+**Port.** `platformio.ini` board line -> `seeed_xiao_esp32s3`, the platform
+line to a version with S3 support, and the pin map in `config.h`. With the
+camera board fitted the free pins are roughly D0-D5 plus I2C: OLED on the
+I2C pair (D4/D5 = GPIO5/GPIO6, so the wiring numbers even stay the same),
+touch pad on D1, a piezo on D2. Skip the SD slot; it costs pins.
 
-**Do OTA at the same time** (`ArduinoOTA`): once it's on the network there's
-no reason to keep walking a USB cable to it. `pio run -t upload
---upload-port deskbuddy.local`.
+**Then it enables:** on-device wake words (ESP-SR), face tracking with the
+camera instead of PIRs for the motion item above, and rendering on one core
+with WiFi/MQTT/TLS on the other so the face never stutters.
 
-**Watch out for:** WiFi costs ~80 mA in bursts and the radio shares the
-core with rendering - keep the web handlers short and never block in them,
-or the frame rate stutters. `WiFi.setSleep(false)` if latency matters more
-than power.
-
-## Weather faces
-
-Rain, sun, snow, cloudy, storm. Needs WiFi first.
-
-**Data.** [Open-Meteo](https://open-meteo.com) - free, no API key, plain
-JSON, a `weather_code` field that maps cleanly onto a handful of
-conditions. Lat/lon in `config.h`, fetch every 15 minutes over HTTPS
-(`WiFiClientSecure`). Parse the few fields by hand or with `ArduinoJson`.
-
-**Faces.** Most of it is particles, which `src/Effects.cpp` already does:
-new `FxType`s for `FX_RAIN` (fast falling streaks, whole screen),
-`FX_SNOW` (slow drifting dots), `FX_CLOUD` (a lumpy blob drifting across
-the top), `FX_RAY` (sun rays / sparkles). Pair each with an expression:
-rain -> sad-ish neutral looking up, sun -> happy, snow -> sleepy and cosy,
-cloudy -> bored, storm -> angry with a lightning flash (invert the panel
-for one frame).
-
-**When to show it.** Not permanently - it's a face, not a widget. A
-"glance at the window" every 20 minutes or so: 4-5 s of the weather face,
-then back to normal. Plus on demand: `weather` over serial / the web page,
-and maybe a double-tap on the touch pad.
+**Case.** The shell needs a camera window and a redesigned MCU cradle for the
+two-board XIAO stack (21 x 17.5 mm). Keep the vent slots: with the camera on
+it draws ~250-300 mA and runs warm; power the camera down except during the
+moments it is actually looking.
 
 ## Microphone / "hey buddy"
 
@@ -107,20 +84,17 @@ Start with detection. If it's still fun, do route 2.
 - **Bambu P1S print watcher.** The P1S in LAN-only mode publishes MQTT
   over TLS (port 8883, its LAN access code as the password, topic
   `device/<serial>/report`). Progress percent, layer, remaining time and
-  state are all in there. The buddy could watch a print: pupils-free
-  progress shown as the eyes slowly "filling", excited when it finishes,
-  sad on a failure, and a glance at the printer (look left) now and then
-  while it runs. `PubSubClient` + `WiFiClientSecure`. Needs WiFi.
+  state are all in there. The buddy could watch a print: progress shown as
+  the eyes slowly "filling", excited when it finishes, sad on a failure, and
+  a glance at the printer (look left) now and then while it runs.
+  `PubSubClient` + `WiFiClientSecure`. WiFi is in place now; **this is next.**
 - **Chirps.** EMO makes sounds. A passive piezo on a PWM pin gives beeps
   and boops per emotion - a rising two-note on wake, a descending one on
   sleep, a trill when petted. Very cheap, adds a surprising amount of
   character. Volume-limited by design; the panel is on a desk.
-- **Time awareness.** NTP once WiFi is up: sleepy after a configured
+- **Time awareness.** NTP (WiFi is up now): sleepy after a configured
   bedtime, a proper wake-up in the morning, a bigger reaction to the first
   interaction of the day. A quiet-hours window where it doesn't chirp.
-- **Notifications in.** One HTTP endpoint, `/notify?emotion=happy&hold=5`,
-  and anything on the network can make a face - a build finishing, a
-  doorbell, a calendar reminder. Falls straight out of the web app.
 - **Home Assistant.** MQTT discovery so the emotion and sleep state show up
   as entities, and automations can drive it. Mostly glue once MQTT exists
   for the printer.

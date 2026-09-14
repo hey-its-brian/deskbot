@@ -35,6 +35,15 @@ class Personality {
   bool asleep() const { return asleep_; }
 
   float idleSeconds() const { return idle_; }
+
+  // Runtime-adjustable copies of DB_IDLE_BORED_S / DB_IDLE_SLEEP_S.
+  void setIdleTimes(float boredS, float sleepS);
+  float boredSeconds() const { return boredS_; }
+  float sleepSeconds() const { return sleepS_; }
+
+  // Keep the current expression at least this long before the mood engine
+  // picks a new one - used while a weather glance is on screen.
+  void holdMood(float seconds) { if (moodT_ < seconds) moodT_ = seconds; }
   // Rises with attention, decays when ignored. Drives how bouncy it feels.
   float energy() const { return energy_; }
 
@@ -52,6 +61,8 @@ class Personality {
   float moodT_ = 3.0f;
   float energy_ = 0.6f;
   float sleepT_ = 10.0f;
+  float boredS_ = 90.0f;
+  float sleepS_ = 300.0f;
   float winkT_ = 12.0f;
 
   bool touchDown_ = false;

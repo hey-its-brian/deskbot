@@ -56,6 +56,9 @@ def main():
     add("doze", "Falling asleep", run(["doze", "150"], tmp))
     for e in EMOTIONS:
         add(e, e.capitalize(), run(["arc", e], tmp))
+    for w, label in [("clear", "Sunny"), ("clear-night", "Clear night"), ("cloudy", "Overcast"),
+                     ("rain", "Rain"), ("snow", "Snow"), ("storm", "Thunderstorm")]:
+        add("wx-" + w, label, run(["weather", w, "150"], tmp))
 
     os.remove(tmp)
 
