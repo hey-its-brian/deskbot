@@ -193,6 +193,12 @@ Measurements, print settings and the STL export commands are in
 [hardware/case/README.md](hardware/case/README.md). Black filament makes the
 bezel disappear around the display, which is most of the look.
 
+## What's next
+
+Ideas that aren't built yet - motion sensing so it looks towards movement,
+a light sensor, a proper display-off sleep - are written up with enough
+detail to pick up cold in [TODO.md](TODO.md).
+
 ## Status
 
 Written and checked on a machine without the hardware attached. Everything in

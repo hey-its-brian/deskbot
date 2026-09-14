@@ -440,18 +440,19 @@ void Face::drawEye(Canvas& g, float cxf, float cyf, float scale, float closed,
     const float band = visBot - visTop;
     if (band >= 3.0f) {
       const float minDim = (float)(w < h ? w : h);
-      int r = (int)lroundf(minDim * 0.20f * cur_.pupil);
+      int r = (int)lroundf(minDim * 0.15f * cur_.pupil);
       const int maxR = (int)((band - 1.0f) * 0.5f);
       if (r > maxR) r = maxR;
       if (r >= 1) {
-        const float slideX = ((float)w * 0.5f - (float)r - 2.0f) * 0.85f;
-        const float slideY = (band * 0.5f - (float)r - 1.0f) * 0.85f;
+        // Half the available travel: enough to read as looking, not googly.
+        const float slideX = ((float)w * 0.5f - (float)r - 2.0f) * 0.45f;
+        const float slideY = (band * 0.5f - (float)r - 1.0f) * 0.45f;
         const int px = cx + (int)lroundf(clampf(gazeX_, -1.0f, 1.0f) * slideX);
         const int py = (int)lroundf((visTop + visBot) * 0.5f +
                                     clampf(gazeY_, -1.0f, 1.0f) * slideY);
         g.fillCircle(px, py, r, DB_BLACK);
         // A catchlight in the upper-left of the pupil.
-        if (cur_.sparkle > 0.35f && r >= 4) {
+        if (cur_.sparkle > 0.35f && r >= 5) {
           const int hr = (r >= 7) ? 2 : 1;
           g.fillCircle(px - r / 2, py - r / 2, hr - 1, DB_WHITE);
           if (hr == 2) g.fillRect(px - r / 2, py - r / 2, 2, 2, DB_WHITE);
