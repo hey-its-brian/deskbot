@@ -119,6 +119,15 @@ weather data, and a CA bundle would be more firmware than the feature.
 
 ## Troubleshooting
 
+**Still stuck after all of the below?** Flash the bare WiFi test instead of
+the buddy: `pio run -e wifitest -t upload && pio device monitor`. It is
+thirty lines of nothing but "scan, then connect", with the ESP-IDF's own
+WiFi logging at maximum, so the console shows the raw auth -> assoc ->
+handshake sequence and exactly where it stops. If *that* connects and the
+buddy does not, it is the firmware and worth reporting; if neither does,
+it is the network.
+
+
 - **Never gets an address**: the console now says why - `wifi: not
   connected, reason 201: no AP found ...` and so on, once per distinct
   reason. `net` over serial repeats the last one; `net scan` lists every
