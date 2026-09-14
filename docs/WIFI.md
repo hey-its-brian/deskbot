@@ -119,8 +119,17 @@ weather data, and a CA bundle would be more firmware than the feature.
 
 ## Troubleshooting
 
-- **Never gets an address**: 2.4 GHz? Correct password? `net` over serial
-  says what state it is in.
+- **Never gets an address**: the console now says why - `wifi: not
+  connected, reason 201: no AP found ...` and so on, once per distinct
+  reason. `net` over serial repeats the last one; `net scan` lists every
+  network in range with channel, signal and security, and marks the
+  configured one, so you can see at once whether the board can even hear
+  your AP. The usual causes: a 5 GHz-only SSID (the C3 is 2.4 GHz only);
+  a `"` or `\` in the password that needs escaping in the C string
+  (`\"`, `\\`); a WPA3-only network (mixed WPA2/WPA3 is fine); and the
+  Super Mini's antenna - many of these boards will not associate at full
+  transmit power unless they are next to the AP, so the firmware backs the
+  radio off to 8.5 dBm (`DB_WIFI_TX_POWER_8_5DBM`).
 - **`deskbuddy.local` doesn't resolve**: macOS and iOS do this natively;
   Linux needs `avahi-daemon`; use the IP from the serial console otherwise.
 - **`weather: fetch failed, http -1`**: DNS or TLS could not get through -

@@ -24,4 +24,11 @@ int rssi();
 // show something better than a frozen face.
 void setOtaProgress(OtaProgressFn fn);
 
+// Why the last connection attempt failed, in words ("" if it hasn't).
+const char* lastFailure();
+
+// Blocking scan (~2-3 s): prints every network in range to `out`, so a
+// "connecting..." that never finishes can be diagnosed from the console.
+void scan(Print& out);
+
 }  // namespace net

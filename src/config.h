@@ -112,6 +112,12 @@
 // OTA request. This is a desk object on a USB cable: default to snappy.
 #define DB_WIFI_POWER_SAVE 0
 
+// Many ESP32-C3 Super Mini boards have a badly matched antenna and simply
+// will not associate at full transmit power unless they are next to the
+// access point; backing off to 8.5 dBm is the widely used fix. Set to 0 to
+// leave the radio at its default.
+#define DB_WIFI_TX_POWER_8_5DBM 1
+
 // --- Weather ---------------------------------------------------------------
 //
 // Fetched from Open-Meteo (free, no key). All of these are starting values -
