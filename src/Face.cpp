@@ -26,7 +26,8 @@ void defaults(Pose& p) {
   p.w = 36.0f;  p.h = 36.0f;  p.radius = 11.0f;  p.spacing = 52.0f;
   p.lidTop = 0.0f;  p.lidBot = 0.0f;  p.slant = 0.0f;  p.arc = 0.0f;
   p.offY = 0.0f;  p.tilt = 0.0f;  p.scaleL = 1.0f;  p.scaleR = 1.0f;
-  p.gazeX = 0.0f;  p.gazeY = 0.0f;  p.sparkle = 0.0f;  p.bob = 1.2f;
+  p.gazeX = 0.0f;  p.gazeY = 0.0f;  p.pupil = 1.0f;  p.sparkle = 1.0f;
+  p.bob = 1.2f;
   p.style = STYLE_EYES;
 }
 
@@ -51,7 +52,6 @@ void poseFor(Emotion e, Pose& p) {
   defaults(p);
   switch (e) {
     case EMOTION_NEUTRAL:
-      p.sparkle = 1.0f;
       break;
 
     case EMOTION_HAPPY:              // eyes squeeze up into two happy domes
@@ -61,7 +61,7 @@ void poseFor(Emotion e, Pose& p) {
 
     case EMOTION_EXCITED:            // big, wide, bouncing
       p.w = 40.0f; p.h = 40.0f; p.radius = 14.0f; p.spacing = 54.0f;
-      p.arc = 0.16f; p.sparkle = 1.0f; p.bob = 2.8f;
+      p.arc = 0.16f; p.bob = 2.8f;
       break;
 
     case EMOTION_SAD:                // inner brows up, looking at the floor
@@ -73,11 +73,12 @@ void poseFor(Emotion e, Pose& p) {
     case EMOTION_ANGRY:              // brows jammed down towards the nose
       p.w = 38.0f; p.h = 30.0f; p.radius = 8.0f; p.spacing = 48.0f;
       p.slant = 10.0f; p.lidTop = 0.30f; p.bob = 1.0f;
+      p.pupil = 0.0f;                // solid glare reads angrier
       break;
 
     case EMOTION_SURPRISED:          // wide open
       p.w = 44.0f; p.h = 44.0f; p.radius = 16.0f; p.spacing = 54.0f;
-      p.offY = -1.0f; p.sparkle = 1.0f; p.bob = 0.5f;
+      p.offY = -1.0f; p.pupil = 0.55f; p.bob = 0.5f;  // tiny pupils = shock
       break;
 
     case EMOTION_SLEEPY:             // heavy lids
@@ -91,7 +92,7 @@ void poseFor(Emotion e, Pose& p) {
 
     case EMOTION_CURIOUS:            // head tilt + one eye wider
       p.scaleL = 1.15f; p.scaleR = 0.85f; p.tilt = 5.0f;
-      p.lidTop = 0.12f; p.slant = -3.0f; p.gazeX = 0.25f; p.sparkle = 1.0f;
+      p.lidTop = 0.12f; p.slant = -3.0f; p.gazeX = 0.25f;
       break;
 
     case EMOTION_SUSPICIOUS:         // narrowed, side-eye
@@ -346,6 +347,7 @@ void Face::update(float dt) {
   cur_.scaleR  = approach(cur_.scaleR,  tgt_.scaleR,  0.11f, dt);
   cur_.gazeX   = approach(cur_.gazeX,   tgt_.gazeX,   0.20f, dt);
   cur_.gazeY   = approach(cur_.gazeY,   tgt_.gazeY,   0.20f, dt);
+  cur_.pupil   = approach(cur_.pupil,   tgt_.pupil,   0.10f, dt);
   cur_.sparkle = approach(cur_.sparkle, tgt_.sparkle, 0.10f, dt);
   cur_.bob     = approach(cur_.bob,     tgt_.bob,     0.30f, dt);
 
@@ -427,13 +429,35 @@ void Face::drawEye(Canvas& g, float cxf, float cyf, float scale, float closed,
     }
   }
 
-  // Highlight glint, skipped when the eye is squinting or curved away.
-  if (cur_.sparkle > 0.35f && cur_.arc < 0.25f && h >= 14 && w >= 14) {
-    int sw = w / 5; if (sw < 3) sw = 3;
-    int sh = h / 5; if (sh < 3) sh = 3;
-    const int sx = innerIsRight ? (x0 + w / 6) : (x0 + w - w / 6 - sw);
-    const int sy = y0 + (int)lroundf(lidTopPx) + h / 7;
-    if (sy + sh < y0 + h - 2) g.fillRoundRect(sx, sy, sw, sh, 1, DB_BLACK);
+  // Pupil. It lives in whatever band of the eye is still visible after the
+  // lids and the happy arc have had their way - so under heavy lids it peeks
+  // out as a sliver instead of vanishing - and it slides around inside that
+  // band with the gaze, which is what makes the eyes googly rather than
+  // just shifty. Black on black outside the eye costs nothing, so no clipping.
+  if (cur_.pupil > 0.05f) {
+    const float visTop = (float)y0 + lidTopPx;
+    const float visBot = (float)(y0 + h) - lidBotPx - cur_.arc * (float)h;
+    const float band = visBot - visTop;
+    if (band >= 3.0f) {
+      const float minDim = (float)(w < h ? w : h);
+      int r = (int)lroundf(minDim * 0.20f * cur_.pupil);
+      const int maxR = (int)((band - 1.0f) * 0.5f);
+      if (r > maxR) r = maxR;
+      if (r >= 1) {
+        const float slideX = ((float)w * 0.5f - (float)r - 2.0f) * 0.85f;
+        const float slideY = (band * 0.5f - (float)r - 1.0f) * 0.85f;
+        const int px = cx + (int)lroundf(clampf(gazeX_, -1.0f, 1.0f) * slideX);
+        const int py = (int)lroundf((visTop + visBot) * 0.5f +
+                                    clampf(gazeY_, -1.0f, 1.0f) * slideY);
+        g.fillCircle(px, py, r, DB_BLACK);
+        // A catchlight in the upper-left of the pupil.
+        if (cur_.sparkle > 0.35f && r >= 4) {
+          const int hr = (r >= 7) ? 2 : 1;
+          g.fillCircle(px - r / 2, py - r / 2, hr - 1, DB_WHITE);
+          if (hr == 2) g.fillRect(px - r / 2, py - r / 2, 2, 2, DB_WHITE);
+        }
+      }
+    }
   }
 }
 
