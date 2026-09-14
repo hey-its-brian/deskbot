@@ -23,10 +23,10 @@ bool ciEqual(const char* a, const char* b) {
 }
 
 void defaults(Pose& p) {
-  p.w = 36.0f;  p.h = 36.0f;  p.radius = 11.0f;  p.spacing = 52.0f;
+  p.w = 34.0f;  p.h = 38.0f;  p.radius = 7.0f;  p.spacing = 52.0f;
   p.lidTop = 0.0f;  p.lidBot = 0.0f;  p.slant = 0.0f;  p.arc = 0.0f;
   p.offY = 0.0f;  p.tilt = 0.0f;  p.scaleL = 1.0f;  p.scaleR = 1.0f;
-  p.gazeX = 0.0f;  p.gazeY = 0.0f;  p.pupil = 1.0f;  p.bob = 1.2f;
+  p.gazeX = 0.0f;  p.gazeY = 0.0f;  p.pupil = 0.0f;  p.bob = 1.2f;
   p.style = STYLE_EYES;
 }
 
@@ -54,34 +54,33 @@ void poseFor(Emotion e, Pose& p) {
       break;
 
     case EMOTION_HAPPY:              // eyes squeeze up into two happy domes
-      p.w = 38.0f; p.h = 34.0f; p.radius = 16.0f; p.arc = 0.42f;
+      p.w = 36.0f; p.h = 34.0f; p.radius = 13.0f; p.arc = 0.42f;
       p.bob = 1.7f;
       break;
 
     case EMOTION_EXCITED:            // big, wide, bouncing
-      p.w = 40.0f; p.h = 40.0f; p.radius = 14.0f; p.spacing = 54.0f;
+      p.w = 38.0f; p.h = 42.0f; p.radius = 9.0f; p.spacing = 54.0f;
       p.arc = 0.16f; p.bob = 2.8f;
       break;
 
     case EMOTION_SAD:                // inner brows up, looking at the floor
-      p.w = 34.0f; p.h = 30.0f; p.radius = 10.0f;
+      p.w = 34.0f; p.h = 32.0f; p.radius = 6.0f;
       p.slant = -7.0f; p.lidTop = 0.22f; p.offY = 4.0f; p.gazeY = 0.30f;
       p.bob = 0.8f;
       break;
 
     case EMOTION_ANGRY:              // brows jammed down towards the nose
-      p.w = 38.0f; p.h = 30.0f; p.radius = 8.0f; p.spacing = 48.0f;
+      p.w = 38.0f; p.h = 30.0f; p.radius = 5.0f; p.spacing = 48.0f;
       p.slant = 10.0f; p.lidTop = 0.30f; p.bob = 1.0f;
-      p.pupil = 0.0f;                // solid glare reads angrier
       break;
 
     case EMOTION_SURPRISED:          // wide open
-      p.w = 44.0f; p.h = 44.0f; p.radius = 16.0f; p.spacing = 54.0f;
-      p.offY = -1.0f; p.pupil = 0.55f; p.bob = 0.5f;  // tiny pupils = shock
+      p.w = 42.0f; p.h = 46.0f; p.radius = 11.0f; p.spacing = 54.0f;
+      p.offY = -1.0f; p.bob = 0.5f;
       break;
 
     case EMOTION_SLEEPY:             // heavy lids
-      p.w = 36.0f; p.h = 30.0f; p.radius = 10.0f;
+      p.w = 36.0f; p.h = 30.0f; p.radius = 6.0f;
       p.lidTop = 0.56f; p.lidBot = 0.08f; p.offY = 4.0f; p.bob = 0.6f;
       break;
 
@@ -95,7 +94,7 @@ void poseFor(Emotion e, Pose& p) {
       break;
 
     case EMOTION_SUSPICIOUS:         // narrowed, side-eye
-      p.w = 38.0f; p.h = 26.0f; p.radius = 7.0f; p.spacing = 50.0f;
+      p.w = 38.0f; p.h = 26.0f; p.radius = 4.0f; p.spacing = 50.0f;
       p.lidTop = 0.42f; p.lidBot = 0.18f; p.slant = 4.0f; p.gazeX = -0.40f;
       p.bob = 0.7f;
       break;
@@ -105,7 +104,7 @@ void poseFor(Emotion e, Pose& p) {
       break;
 
     case EMOTION_BORED:              // half-lidded, staring off sideways
-      p.w = 36.0f; p.h = 26.0f; p.radius = 9.0f;
+      p.w = 36.0f; p.h = 26.0f; p.radius = 5.0f;
       p.lidTop = 0.45f; p.offY = 3.0f; p.gazeX = -0.5f; p.gazeY = 0.2f;
       p.bob = 0.7f;
       break;
