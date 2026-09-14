@@ -166,7 +166,10 @@ void Face::setEmotion(Emotion e, bool immediate) {
   if (e == emotion_ && !hasPending_) return;
   pending_ = e;
   hasPending_ = true;
-  if (blinkPhase_ == 0) blink();  // hide the change behind a blink
+  // Hide the change behind a blink. If the lids are already closing, the
+  // swap rides that blink; if they are opening, queue one right behind it.
+  if (blinkPhase_ == 0) blink();
+  else if (blinkPhase_ == 2) blinkQueued_ = true;
 }
 
 void Face::flash(Emotion e, float holdSeconds, Emotion next) {
@@ -267,7 +270,8 @@ void Face::update(float dt) {
   switch (blinkPhase_) {
     case 0:
       nextBlink_ -= dt;
-      if (autoBlink_ && nextBlink_ <= 0.0f) blink();
+      if (blinkQueued_) { blinkQueued_ = false; blink(); }
+      else if (autoBlink_ && nextBlink_ <= 0.0f) blink();
       break;
     case 1:
       blinkT_ += dt;

@@ -22,6 +22,11 @@ class Personality {
   void update(float dt);
   void onInteraction(Interaction what);
 
+  // Capacitive pad. Call every frame with the current state: a short touch is
+  // a tap (it says hello), a held one is petting (it melts).
+  void setTouch(bool down, float dt);
+  bool petting() const { return petting_; }
+
   void setAutoMood(bool on) { autoMood_ = on; }
   bool autoMood() const { return autoMood_; }
 
@@ -35,6 +40,9 @@ class Personality {
 
  private:
   Emotion pickMood();
+  void onTap();
+  void beginPet();
+  void endPet();
 
   Face* face_ = nullptr;
   Rng rng_;
@@ -45,6 +53,12 @@ class Personality {
   float energy_ = 0.6f;
   float sleepT_ = 10.0f;
   float winkT_ = 12.0f;
+
+  bool touchDown_ = false;
+  bool petting_ = false;
+  float petT_ = 0.0f;
+  float heartT_ = 0.0f;
+  float tapAgo_ = 99.0f;   // seconds since the last tap, for double-tap
 };
 
 }  // namespace db

@@ -18,6 +18,10 @@ static Adafruit_SSD1306 display(DB_SCREEN_W, DB_SCREEN_H, &Wire, -1);
 static db::Face face;
 static db::Personality brain;
 static Button button(DB_PIN_BUTTON, DB_BUTTON_ACTIVE_LOW);
+static Button touch(DB_PIN_TOUCH, !DB_TOUCH_ACTIVE_HIGH);
+
+// `pet` / `tap` over serial pretend a finger is on the pad until this time.
+static uint32_t simTouchUntil = 0;
 
 static uint8_t oledAddress = 0x3C;
 static bool displayReady = false;
@@ -91,6 +95,7 @@ static void printHelp() {
   Serial.println(F("  look <x> <y>     gaze direction, -1..1"));
   Serial.println(F("  jolt             startle shake"));
   Serial.println(F("  poke             same as pressing the button"));
+  Serial.println(F("  tap | pet        same as touching / holding the touch pad"));
   Serial.println(F("  sleep | wake"));
   Serial.println(F("  drift on|off     slow anti burn-in wander"));
   Serial.println(F("  status"));
@@ -137,6 +142,10 @@ static void runCommand(char* line) {
     face.jolt(1.0f);
   } else if (!strcmp(line, "poke")) {
     brain.onInteraction(db::TOUCH_POKE);
+  } else if (!strcmp(line, "tap")) {
+    simTouchUntil = millis() + 120;
+  } else if (!strcmp(line, "pet")) {
+    simTouchUntil = millis() + 3500;
   } else if (!strcmp(line, "sleep")) {
     brain.sleep();
   } else if (!strcmp(line, "wake")) {
@@ -147,6 +156,7 @@ static void runCommand(char* line) {
     Serial.print(F("emotion=")); Serial.print(db::emotionName(face.emotion()));
     Serial.print(F(" auto=")); Serial.print(brain.autoMood() ? 1 : 0);
     Serial.print(F(" asleep=")); Serial.print(brain.asleep() ? 1 : 0);
+    Serial.print(F(" petting=")); Serial.print(brain.petting() ? 1 : 0);
     Serial.print(F(" idle=")); Serial.print(brain.idleSeconds(), 1);
     Serial.print(F("s oled=0x")); Serial.println(oledAddress, HEX);
   } else {
@@ -182,6 +192,7 @@ void setup() {
   led(false);
 
   button.begin();
+  touch.begin();
 
   Wire.begin(DB_PIN_SDA, DB_PIN_SCL);
   Wire.setClock(DB_I2C_CLOCK);
@@ -236,6 +247,9 @@ void loop() {
   if (button.takeSingle()) brain.onInteraction(db::TOUCH_POKE);
   if (button.takeDouble()) brain.onInteraction(db::TOUCH_DOUBLE);
   if (button.takeLong())   brain.onInteraction(db::TOUCH_HOLD);
+
+  touch.update(millis());
+  brain.setTouch(touch.isDown() || (int32_t)(simTouchUntil - millis()) > 0, dt);
 
   brain.update(dt);
   face.update(dt);

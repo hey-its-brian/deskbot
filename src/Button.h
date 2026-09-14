@@ -11,7 +11,7 @@ class Button {
 
   void begin() {
     if (pin_ < 0) return;
-    pinMode(pin_, activeLow_ ? INPUT_PULLUP : INPUT);
+    pinMode(pin_, activeLow_ ? INPUT_PULLUP : INPUT_PULLDOWN);
   }
 
   void update(uint32_t now);

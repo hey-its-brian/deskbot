@@ -34,7 +34,7 @@ static void step(Face& face, HostGfx& g, int frames, FILE* out, bool capture) {
 
 int main(int argc, char** argv) {
   if (argc < 3) {
-    fprintf(stderr, "usage: preview <sheet | arc <name> | anim <sec> | poke <n> | doze <n>> <out.bin>\n");
+    fprintf(stderr, "usage: preview <sheet | arc <name> | anim <sec> | poke <n> | pet <n> | doze <n>> <out.bin>\n");
     return 2;
   }
   const char* mode = argv[1];
@@ -104,6 +104,24 @@ int main(int argc, char** argv) {
     brain.begin(face, 0x51EEDu);
     for (int i = 0; i < n; ++i) {
       if (i == 12) brain.onInteraction(TOUCH_POKE);
+      brain.update(kDt);
+      face.update(kDt);
+      face.draw(g);
+      emit(out, g);
+    }
+    frames = n;
+    fclose(out);
+  } else if (strcmp(mode, "pet") == 0 && argc >= 4) {
+    // Finger lands on the pad at frame 12 and stays for three seconds.
+    const int n = atoi(argv[2]);
+    FILE* out = fopen(argv[3], "wb");
+    if (!out) return 1;
+    Face face;
+    Personality brain;
+    face.begin(0x9E7u);
+    brain.begin(face, 0x9E7u);
+    for (int i = 0; i < n; ++i) {
+      brain.setTouch(i >= 12 && i < 12 + 90, kDt);
       brain.update(kDt);
       face.update(kDt);
       face.draw(g);

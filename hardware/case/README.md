@@ -32,5 +32,14 @@ openscad -o shell.stl -D 'part="shell"' deskbuddy_case.scad
 
 Opening the file with `part = "both"` gives an assembly preview.
 
+## Touch pad
+
+If you have a TTP223 touch module, stick it to the **inside of the shell's top
+wall** with double-sided tape, pad facing out. It senses through 2-3 mm of
+PLA, so the top of the case becomes the buddy's head - pat it and it reacts,
+with nothing visible from outside. The wall is `wall` = 2.2 mm by default,
+which is inside the module's range; if touches feel weak, thin that wall to
+1.6 mm just where the pad sits.
+
 Black filament makes the bezel disappear around the display, which is most of
 the EMO look. A dark grey or translucent smoke front looks good too.

@@ -90,6 +90,8 @@ void Personality::update(float dt) {
     return;
   }
 
+  tapAgo_ += dt;
+  if (petting_) return;      // undivided attention while being petted
   if (!autoMood_) return;
 
   // The odd wink when it's in a good mood.
@@ -111,6 +113,74 @@ void Personality::update(float dt) {
   }
 
   if (idle_ > DB_IDLE_SLEEP_S) sleep();
+}
+
+// ---------------------------------------------------------------------------
+//  Touch pad
+// ---------------------------------------------------------------------------
+void Personality::setTouch(bool down, float dt) {
+  if (!face_) return;
+
+  if (down) {
+    if (!touchDown_) {              // finger just landed
+      touchDown_ = true;
+      petT_ = 0.0f;
+      idle_ = 0.0f;
+      if (asleep_) wake(false);     // a pat is a gentle wake, unlike a poke
+    }
+    petT_ += dt;
+    if (!petting_ && petT_ >= DB_PET_HOLD_S) beginPet();
+    if (petting_) {
+      heartT_ -= dt;
+      if (heartT_ <= 0.0f) {
+        heartT_ = rng_.range(0.35f, 0.6f);
+        face_->fx().spawn(FX_HEART, rng_.range(28.0f, 100.0f), 15.0f,
+                          rng_.range(-4.0f, 4.0f), -5.5f, 2.0f,
+                          rng_.range(3.0f, 4.0f));
+      }
+      // Keep it up long enough and it's smitten.
+      if (petT_ >= 2.8f && face_->emotion() != EMOTION_LOVE) {
+        face_->setEmotion(EMOTION_LOVE);
+      }
+    }
+  } else if (touchDown_) {          // finger lifted
+    touchDown_ = false;
+    if (petting_) endPet();
+    else onTap();
+  }
+}
+
+void Personality::onTap() {
+  energy_ = clampf(energy_ + 0.15f, 0.0f, 1.0f);
+  if (tapAgo_ < 0.4f) {             // second tap in quick succession: playful
+    tapAgo_ = 99.0f;
+    face_->jolt(0.4f);
+    face_->flash(EMOTION_EXCITED, 2.5f, EMOTION_HAPPY);
+    moodT_ = 5.0f;
+    return;
+  }
+  tapAgo_ = 0.0f;
+  face_->look(0.0f, 0.0f, 1.6f);    // "oh, hi"
+  face_->wink(rng_.chance(0.5f));
+  face_->flash(EMOTION_HAPPY, 2.2f, EMOTION_NEUTRAL);
+  moodT_ = 3.0f;
+}
+
+void Personality::beginPet() {
+  petting_ = true;
+  heartT_ = 0.2f;
+  energy_ = clampf(energy_ + 0.3f, 0.0f, 1.0f);
+  face_->setAutoGaze(false);
+  face_->look(0.0f, -0.35f, 1.0e6f);  // eyes up towards the hand
+  face_->setEmotion(EMOTION_HAPPY);
+}
+
+void Personality::endPet() {
+  petting_ = false;
+  face_->setAutoGaze(true);
+  face_->look(0.0f, 0.0f, 1.2f);
+  face_->flash(EMOTION_HAPPY, 4.0f, EMOTION_NEUTRAL);  // contented afterglow
+  moodT_ = 6.0f;
 }
 
 void Personality::onInteraction(Interaction what) {

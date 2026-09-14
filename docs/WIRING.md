@@ -16,6 +16,41 @@ Optional, and only if you want a button that isn't the onboard one:
 | one leg | `GPIO9` | `DB_PIN_BUTTON`, internal pull-up |
 | other leg | `GND` | |
 
+## Touch pad (optional, recommended)
+
+A **TTP223** capacitive touch module - the little 3-pin board that is nearly
+every "touch sensor button" sold for microcontrollers. The C3 has no native
+touch pins, so a module like this is the right way to do it anyway.
+
+| TTP223 | ESP32-C3 | Note |
+| --- | --- | --- |
+| `VCC` | `3V3` | it runs 2.0-5.5 V; 3.3 V keeps the signal at C3 levels |
+| `GND` | `GND` | |
+| `I/O` (or `SIG`, `OUT`) | `GPIO4` | `DB_PIN_TOUCH` |
+
+The module drives the line **HIGH while touched** and the firmware enables
+the C3's internal pull-down, so it idles low even if unplugged.
+
+Two things worth knowing about these modules:
+
+- The two solder-jumper pads on the back, **A** and **B**, change how it
+  behaves: A flips the output polarity, B turns it into a toggle (touch once
+  on, touch again off). **Leave both open.** In toggle mode the tap-vs-hold
+  logic can't work.
+- It senses **through 2-3 mm of plastic**. Stick the pad to the inside of
+  the case top and the whole head becomes touch sensitive with nothing
+  visible from outside - which is exactly how EMO's head pats feel. If it
+  triggers on its own, move it away from the ESP32's antenna end or add a
+  ground plane (a bit of foil under GND) behind it.
+
+Set `DB_PIN_TOUCH` to `-1` if you don't have one; nothing else changes.
+
+| Touch | What happens |
+| --- | --- |
+| tap | it looks at you and winks |
+| double tap | excited |
+| hold | petting: squints up at your hand, hearts, then heart-eyes at ~3 s |
+
 ## Why GPIO5 and GPIO6
 
 The Arduino core's *default* I2C pins on the C3 are GPIO8 and GPIO9, and on

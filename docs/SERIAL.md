@@ -25,6 +25,7 @@ echo "happy" > /dev/ttyACM0              # Linux
 | `look <x> <y>` | gaze direction, each `-1..1`, e.g. `look -1 0.3` |
 | `jolt` | startle shake |
 | `poke` | exactly as if you pressed the button |
+| `tap` / `pet` | exactly as if you tapped / held the touch pad (pet holds 3.5 s) |
 | `sleep` / `wake` | |
 | `drift on` / `drift off` | slow anti burn-in wander |
 | `status` | current emotion, idle time, detected I2C address |

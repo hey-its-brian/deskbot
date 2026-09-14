@@ -107,6 +107,7 @@ class Face {
   float blinkT_ = 0.0f;
   float blinkAmt_ = 0.0f;   // 0 open .. 1 shut
   float nextBlink_ = 2.0f;
+  bool blinkQueued_ = false;  // an expression change is waiting on a blink
   float winkL_ = 0.0f, winkR_ = 0.0f;  // extra lid for a one-eyed blink
   float winkT_ = -1.0f;
   int8_t winkEye_ = -1;

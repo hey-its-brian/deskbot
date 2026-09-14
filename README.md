@@ -25,7 +25,9 @@ character rather than a cartoon. No mouth to get wrong.
 - **Has opinions.** A weighted mood engine picks what to feel next: mostly
   calm, occasionally dramatic. Ignored for 90 seconds and it gets visibly
   bored; five minutes and it nods off and the panel dims.
-- **Reacts to being poked** - startle, shake, then cheer up.
+- **Reacts to being poked** - startle, shake, then cheer up. **And to being
+  petted** - a capacitive pad under the case top makes the whole head touch
+  sensitive: tap to say hi, hold to pet, hold long enough and it melts.
 - **Little flourishes**: floating Z's while asleep, hearts, a nervous sweat
   drop, exclamation marks, tears, spiral eyes when dizzy.
 - **Anti burn-in drift**, because a bright static face on an OLED all day is
@@ -40,7 +42,9 @@ character rather than a cartoon. No mouth to get wrong.
 | 4 jumper wires | |
 | USB-C cable | |
 
-Optional: a printed case (`hardware/case/`) and four M2x8 screws.
+Optional: a TTP223-style capacitive touch pad (one wire, and it becomes the
+buddy's head - see below), a printed case (`hardware/case/`) and four M2x8
+screws.
 
 ## Wiring
 
@@ -52,7 +56,10 @@ Optional: a printed case (`hardware/case/`) and four M2x8 screws.
 | SCL | GPIO6 |
 
 That's it. The **onboard BOOT button** (GPIO9) is the "poke me" button, so
-there is nothing else to wire. Full notes, including why not the default I2C
+there is nothing else to wire.
+
+Have a touch sensor? `VCC -> 3V3`, `GND -> GND`, `SIG -> GPIO4`. A poke and a
+pat get different reactions. Full notes, including why not the default I2C
 pins, are in [docs/WIRING.md](docs/WIRING.md).
 
 ## Flash it
@@ -80,11 +87,19 @@ drivers, no BOOT-button dance.
 
 ## Playing with it
 
-| Button | |
+| BOOT button | |
 | --- | --- |
-| short press | poke it |
+| short press | poke it - startle, then cheer up |
 | double press | hearts |
 | long press | sleep / wake |
+
+| Touch pad | |
+| --- | --- |
+| tap | "oh, hi" - looks at you, winks |
+| double tap | playful - excited |
+| hold | petting - squints up at your hand, hearts, and after ~3 s it's smitten |
+
+A pat wakes it gently; a poke wakes it startled.
 
 Or drive it over USB serial at 115200 - `help` lists everything:
 

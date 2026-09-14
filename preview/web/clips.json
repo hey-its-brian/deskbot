@@ -2,7 +2,7 @@
  "frameW": 128,
  "frameH": 64,
  "cols": 32,
- "total": 1580,
+ "total": 1730,
  "clips": [
   {
    "id": "auto",
@@ -17,81 +17,87 @@
    "count": 110
   },
   {
+   "id": "pet",
+   "label": "Petted",
+   "start": 890,
+   "count": 150
+  },
+  {
    "id": "doze",
    "label": "Falling asleep",
-   "start": 890,
+   "start": 1040,
    "count": 150
   },
   {
    "id": "neutral",
    "label": "Neutral",
-   "start": 1040,
+   "start": 1190,
    "count": 45
   },
   {
    "id": "happy",
    "label": "Happy",
-   "start": 1085,
+   "start": 1235,
    "count": 45
   },
   {
    "id": "excited",
    "label": "Excited",
-   "start": 1130,
+   "start": 1280,
    "count": 45
   },
   {
    "id": "sad",
    "label": "Sad",
-   "start": 1175,
+   "start": 1325,
    "count": 45
   },
   {
    "id": "angry",
    "label": "Angry",
-   "start": 1220,
+   "start": 1370,
    "count": 45
   },
   {
    "id": "surprised",
    "label": "Surprised",
-   "start": 1265,
+   "start": 1415,
    "count": 45
   },
   {
    "id": "sleepy",
    "label": "Sleepy",
-   "start": 1310,
+   "start": 1460,
    "count": 45
   },
   {
    "id": "love",
    "label": "Love",
-   "start": 1355,
+   "start": 1505,
    "count": 45
   },
   {
    "id": "curious",
    "label": "Curious",
-   "start": 1400,
+   "start": 1550,
    "count": 45
   },
   {
    "id": "suspicious",
    "label": "Suspicious",
-   "start": 1445,
+   "start": 1595,
    "count": 45
   },
   {
    "id": "dizzy",
    "label": "Dizzy",
-   "start": 1490,
+   "start": 1640,
    "count": 45
   },
   {
    "id": "bored",
    "label": "Bored",
-   "start": 1535,
+   "start": 1685,
    "count": 45
   }
  ]

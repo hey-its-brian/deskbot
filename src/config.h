@@ -32,6 +32,19 @@
 #define DB_PIN_BUTTON 9
 #define DB_BUTTON_ACTIVE_LOW 1
 
+// --- Touch sensor ----------------------------------------------------------
+//
+// A TTP223-style capacitive touch module: VCC -> 3V3, GND -> GND, SIG (I/O)
+// -> this pin. The module drives the line HIGH while touched (its default;
+// leave the A/B solder pads on the back open). Works through 2-3 mm of PLA,
+// so it can hide under the top of the case and become the buddy's "head".
+// Set to -1 if you don't have one.
+#define DB_PIN_TOUCH 4
+#define DB_TOUCH_ACTIVE_HIGH 1
+
+// A touch shorter than this is a tap (hello); longer is petting.
+#define DB_PET_HOLD_S 0.35f
+
 // --- Onboard LED -----------------------------------------------------------
 //
 // GPIO8, active LOW on the Super Mini. Off by default: it is a very bright
