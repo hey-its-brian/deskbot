@@ -47,7 +47,7 @@ Set `DB_PIN_TOUCH` to `-1` if you don't have one; nothing else changes.
 
 | Touch | What happens |
 | --- | --- |
-| tap | it looks at you and winks |
+| tap | it looks at you and brightens up |
 | double tap | excited |
 | hold | petting: squints up at your hand, hearts, then heart-eyes at ~3 s |
 

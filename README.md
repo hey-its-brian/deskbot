@@ -100,7 +100,7 @@ shows up as a native USB CDC port - no drivers, no BOOT-button dance.
 
 | Touch pad | |
 | --- | --- |
-| tap | "oh, hi" - looks at you, winks |
+| tap | "oh, hi" - looks at you, brightens up |
 | double tap | playful - excited |
 | hold | petting - squints up at your hand, hearts, and after ~3 s it's smitten |
 
