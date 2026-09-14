@@ -26,8 +26,7 @@ void defaults(Pose& p) {
   p.w = 36.0f;  p.h = 36.0f;  p.radius = 11.0f;  p.spacing = 52.0f;
   p.lidTop = 0.0f;  p.lidBot = 0.0f;  p.slant = 0.0f;  p.arc = 0.0f;
   p.offY = 0.0f;  p.tilt = 0.0f;  p.scaleL = 1.0f;  p.scaleR = 1.0f;
-  p.gazeX = 0.0f;  p.gazeY = 0.0f;  p.pupil = 1.0f;  p.sparkle = 1.0f;
-  p.bob = 1.2f;
+  p.gazeX = 0.0f;  p.gazeY = 0.0f;  p.pupil = 1.0f;  p.bob = 1.2f;
   p.style = STYLE_EYES;
 }
 
@@ -348,11 +347,21 @@ void Face::update(float dt) {
   cur_.gazeX   = approach(cur_.gazeX,   tgt_.gazeX,   0.20f, dt);
   cur_.gazeY   = approach(cur_.gazeY,   tgt_.gazeY,   0.20f, dt);
   cur_.pupil   = approach(cur_.pupil,   tgt_.pupil,   0.10f, dt);
-  cur_.sparkle = approach(cur_.sparkle, tgt_.sparkle, 0.10f, dt);
   cur_.bob     = approach(cur_.bob,     tgt_.bob,     0.30f, dt);
 
   spawnMoodEffects(dt);
   fx_.update(dt);
+}
+
+// A filled disc built from scanlines. Library circles get pointy at pupil
+// sizes (a one-pixel tip top and bottom); measuring against a radius padded
+// by half a pixel keeps a 5 px pupil looking like a dot instead of a diamond.
+static void fillDisc(Canvas& g, int cx, int cy, int r, uint16_t colour) {
+  const float rr = (float)r + 0.5f;
+  for (int dy = -r; dy <= r; ++dy) {
+    const int dx = (int)sqrtf(rr * rr - (float)(dy * dy));
+    g.drawFastHLine(cx - dx, cy + dy, 2 * dx + 1, colour);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -450,13 +459,7 @@ void Face::drawEye(Canvas& g, float cxf, float cyf, float scale, float closed,
         const int px = cx + (int)lroundf(clampf(gazeX_, -1.0f, 1.0f) * slideX);
         const int py = (int)lroundf((visTop + visBot) * 0.5f +
                                     clampf(gazeY_, -1.0f, 1.0f) * slideY);
-        g.fillCircle(px, py, r, DB_BLACK);
-        // A catchlight in the upper-left of the pupil.
-        if (cur_.sparkle > 0.35f && r >= 5) {
-          const int hr = (r >= 7) ? 2 : 1;
-          g.fillCircle(px - r / 2, py - r / 2, hr - 1, DB_WHITE);
-          if (hr == 2) g.fillRect(px - r / 2, py - r / 2, 2, 2, DB_WHITE);
-        }
+        fillDisc(g, px, py, r, DB_BLACK);
       }
     }
   }

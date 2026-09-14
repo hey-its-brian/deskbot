@@ -51,7 +51,6 @@ struct Pose {
   float gazeX;       // resting gaze, -1..1
   float gazeY;
   float pupil;       // 0..1 pupil size (0 = none; the angry face goes without)
-  float sparkle;     // 0..1 highlight glint inside the pupil
   float bob;         // idle breathing amplitude in px
   EyeStyle style;
 };

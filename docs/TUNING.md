@@ -20,7 +20,6 @@ emotion, each filling in a `Pose`:
 | `scaleL`, `scaleR` | per-eye size multiplier. Asymmetry reads as curiosity |
 | `gazeX`, `gazeY` | resting gaze, `-1..1` |
 | `pupil` | `0..1` pupil size. It sits in whatever band of the eye the lids leave visible and slides with the gaze; `0` for a solid glare (angry) |
-| `sparkle` | catchlight in the upper-left of the pupil |
 | `bob` | idle breathing amplitude in pixels |
 | `style` | `STYLE_EYES`, `STYLE_HEART` or `STYLE_SPIRAL` |
 
