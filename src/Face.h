@@ -13,6 +13,7 @@
 #include "Easing.h"
 #include "Effects.h"
 #include "Gfx.h"
+#include "Weather.h"
 
 namespace db {
 
@@ -79,6 +80,15 @@ class Face {
 
   Effects& fx() { return fx_; }
 
+  // Weather ---------------------------------------------------------------
+  // A short "glance at the window": the matching expression plus rain, snow,
+  // clouds or sun, and the temperature in a corner. Falls back to whatever
+  // it was feeling afterwards. `unit` is 'C' or 'F'; pass hasTemp=false to
+  // skip the readout.
+  void showWeather(WeatherKind kind, bool isDay, bool hasTemp, int temp,
+                   char unit, float seconds);
+  bool weatherShowing() const { return wxT_ > 0.0f; }
+
   // Frame -------------------------------------------------------------------
   void update(float dt);
   void draw(Canvas& g);
@@ -89,6 +99,8 @@ class Face {
  private:
   void applyPose(Emotion e, bool immediate);
   void spawnMoodEffects(float dt);
+  void spawnWeatherEffects(float dt);
+  void drawWeatherOverlay(Canvas& g);
   void drawEye(Canvas& g, float cx, float cy, float scale, float closed,
                bool innerIsRight) const;
 
@@ -129,6 +141,16 @@ class Face {
   float driftB_ = 0.0f;    // lose precision on a long uptime)
   float fxTimer_ = 0.0f;
   bool drift_ = true;
+
+  // weather glance
+  WeatherKind wxKind_ = WX_UNKNOWN;
+  bool wxDay_ = true;
+  bool wxHasTemp_ = false;
+  int wxTemp_ = 0;
+  char wxUnit_ = 'C';
+  float wxT_ = 0.0f;
+  float wxFxT_ = 0.0f;
+  float wxBoltT_ = 0.0f;
 
   Rng rng_;
   Effects fx_;

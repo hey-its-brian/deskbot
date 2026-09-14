@@ -34,6 +34,11 @@ if you keep going for about three seconds it is smitten. There are floating
 Z's while it sleeps, tears when it is sad, a nervous sweat drop, and spiral
 eyes when it is dizzy.
 
+Put it on WiFi and it also **glances at the weather** every so often - six
+seconds of sun, rain, snow, fog or a thunderstorm animated around the matching
+face, with the temperature small in the corner - and you get a **web page** to
+poke it, change its expression and adjust its settings from your phone.
+
 The whole face also wanders a few pixels on two slow periods that never line
 up. A bright static image on an OLED all day is exactly how you etch a panel.
 
@@ -80,6 +85,12 @@ pio device monitor     # or: make monitor
 `platformio.ini` pulls in the libraries and the toolchain. The Super Mini
 shows up as a native USB CDC port - no drivers, no BOOT-button dance.
 
+After that first flash, once it is on WiFi, updates go over the air:
+
+```sh
+pio run -e esp32-c3-supermini-ota -t upload
+```
+
 ### Arduino IDE
 
 1. Boards Manager: install **esp32** by Espressif Systems.
@@ -105,6 +116,23 @@ shows up as a native USB CDC port - no drivers, no BOOT-button dance.
 | hold | petting - squints up at your hand, hearts, and after ~3 s it's smitten |
 
 A pat wakes it gently; a poke wakes it startled.
+
+## Putting it on WiFi
+
+```sh
+cp src/secrets.example.h src/secrets.h   # fill in your 2.4 GHz network
+pio run -t upload
+```
+
+It then answers at `http://deskbuddy.local`: the twelve expressions, poke /
+pet / sleep, the weather, and settings that stick across reboots. Set your
+latitude and longitude there and the weather glances start. Everything the
+page does is also a four-endpoint API, so `curl -d 'emotion=angry&hold=5'
+http://deskbuddy.local/api/notify` is all it takes to make a build failure
+show on its face. [docs/WIFI.md](docs/WIFI.md) has the details, the OTA
+password, and what each kind of weather looks like.
+
+No `secrets.h` means no networking, and everything else works as before.
 
 ## Driving it over serial
 
@@ -157,6 +185,12 @@ src/
   Effects.*        floating hearts / Z's / tears / sweat particles
   Shapes.*         heart, spiral, droplet, Z, star primitives
   Button.*         debounce, single / double / long press
+  Weather.*        weather conditions and the WMO code mapping
+  Net.*            WiFi, mDNS, over-the-air updates
+  WebApp.*         the control page and its JSON API
+  WebPage.h        the page itself, served from flash
+  WeatherClient.*  Open-Meteo fetch on its own task
+  Settings.*       runtime settings, kept in flash
   Easing.h         smoothing helpers and a deterministic RNG
   Gfx.h            one drawing surface, two backends (device / host preview)
 tools/host/        the desktop renderer, a stdlib-only PNG writer, the GIF script
@@ -209,4 +243,6 @@ the environment this was written in, so the firmware has never been through a
 full `pio run`, and it has never been flashed to a physical board.
 
 If the first flash misbehaves, `status` over serial and
-[docs/WIRING.md](docs/WIRING.md) are the places to start.
+[docs/WIRING.md](docs/WIRING.md) are the places to start. The networking layer
+was written the same way - checked against stub headers, never run on a
+board - so the first `wifi: up` line on the console is the real test.

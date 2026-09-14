@@ -38,6 +38,7 @@ void Effects::update(float dt) {
     if (q.type == FX_HEART || q.type == FX_ZZZ || q.type == FX_NOTE) {
       q.x += sinf(q.age * 3.4f + (float)i) * 9.0f * dt;              // drift
     }
+    if (q.type == FX_SNOW) q.x += sinf(q.age * 2.1f + (float)i) * 6.0f * dt;
   }
 }
 
@@ -46,12 +47,15 @@ void Effects::draw(Canvas& g) const {
     const Particle& q = p_[i];
     if (!q.alive) continue;
     const float t = q.age / q.life;
-    if (t > 0.92f) continue;  // pop out just before death
+    if (t > 0.92f && q.type < FX_RAIN) continue;  // pop out just before death
 
-    // Grow in, shrink out.
+    // Grow in, shrink out - except weather, which just travels off-screen.
     float s = q.size;
-    if (t < 0.18f) s *= easeOutBack(t / 0.18f);
-    else if (t > 0.7f) s *= 1.0f - (t - 0.7f) / 0.3f;
+    const bool weather = (q.type >= FX_RAIN);
+    if (!weather) {
+      if (t < 0.18f) s *= easeOutBack(t / 0.18f);
+      else if (t > 0.7f) s *= 1.0f - (t - 0.7f) / 0.3f;
+    }
     const int size = (int)lroundf(s);
     if (size < 1) continue;
 
@@ -66,6 +70,16 @@ void Effects::draw(Canvas& g) const {
       case FX_EXCLAIM: drawExclaim(g, x, y, size * 2, DB_WHITE); break;
       case FX_NOTE:    drawNote(g, x, y, size, DB_WHITE); break;
       case FX_STAR:    drawStar(g, x, y, size, DB_WHITE); break;
+      case FX_RAIN:    g.drawFastVLine(x, y, size, DB_WHITE); break;
+      case FX_SNOW:
+        if (size >= 2) drawStar(g, x, y, 1, DB_WHITE);
+        else g.drawPixel(x, y, DB_WHITE);
+        break;
+      case FX_CLOUD:   drawCloud(g, x, y, size * 4, DB_WHITE); break;
+      case FX_FOG:
+        for (int i = 0; i < size; i += 4) g.drawFastHLine(x + i, y, 2, DB_WHITE);
+        break;
+      case FX_BOLT:    drawBolt(g, x, y, size, DB_WHITE); break;
     }
   }
 }

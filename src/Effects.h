@@ -16,12 +16,17 @@ enum FxType : uint8_t {
   FX_EXCLAIM,
   FX_TEAR,
   FX_NOTE,
-  FX_STAR
+  FX_STAR,
+  FX_RAIN,     // a falling streak
+  FX_SNOW,     // a slow, wandering flake
+  FX_CLOUD,    // drifts across the top of the screen
+  FX_FOG,      // a horizontal wisp
+  FX_BOLT      // lightning, gone in a few frames
 };
 
 class Effects {
  public:
-  static const int MAX_PARTICLES = 8;
+  static const int MAX_PARTICLES = 14;  // rain needs a few more than hearts
 
   void clear();
   void spawn(FxType type, float x, float y, float vx, float vy, float life, float size);

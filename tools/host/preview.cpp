@@ -34,7 +34,7 @@ static void step(Face& face, HostGfx& g, int frames, FILE* out, bool capture) {
 
 int main(int argc, char** argv) {
   if (argc < 3) {
-    fprintf(stderr, "usage: preview <sheet | arc <name> | anim <sec> | poke <n> | pet <n> | doze <n>> <out.bin>\n");
+    fprintf(stderr, "usage: preview <sheet | arc <name> | anim <sec> | poke <n> | pet <n> | doze <n> | weather <kind> <n>> <out.bin>\n");
     return 2;
   }
   const char* mode = argv[1];
@@ -126,6 +126,39 @@ int main(int argc, char** argv) {
     brain.begin(face, 0x9E7u);
     for (int i = 0; i < n; ++i) {
       brain.setTouch(i >= 12 && i < 12 + 105, kDt);
+      brain.update(kDt);
+      face.update(kDt);
+      face.draw(g);
+      emit(out, g);
+    }
+    frames = n;
+    fclose(out);
+  } else if (strcmp(mode, "weather") == 0 && argc >= 5) {
+    // weather <kind> <frames> out.bin - a glance at the given conditions
+    // (append "night" to the kind for the after-dark version: "clear-night").
+    char kindName[24];
+    strncpy(kindName, argv[2], sizeof(kindName) - 1);
+    kindName[sizeof(kindName) - 1] = 0;
+    bool day = true;
+    char* dash = strchr(kindName, '-');
+    if (dash) { *dash = 0; day = false; }
+    WeatherKind kind;
+    if (!weatherFromName(kindName, kind)) {
+      fprintf(stderr, "unknown weather '%s'\n", argv[2]);
+      return 2;
+    }
+    const int n = atoi(argv[3]);
+    FILE* out = fopen(argv[4], "wb");
+    if (!out) return 1;
+    Face face;
+    Personality brain;
+    face.begin(0x5EA7u);
+    brain.begin(face, 0x5EA7u);
+    for (int i = 0; i < n; ++i) {
+      if (i == 8) {
+        face.showWeather(kind, day, true, day ? 72 : 48, 'F', (float)(n - 8) / 30.0f);
+        brain.holdMood(10.0f);
+      }
       brain.update(kDt);
       face.update(kDt);
       face.draw(g);

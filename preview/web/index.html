@@ -365,6 +365,10 @@
         <h2>Expressions</h2>
         <div class="chips" id="chips-emotion"></div>
       </div>
+      <div>
+        <h2>Weather glances</h2>
+        <div class="chips" id="chips-weather"></div>
+      </div>
     </aside>
   </main>
 
@@ -386,6 +390,10 @@
     <p>Each expression clip starts from neutral, so you can see the trick that
       does most of the work: the change is hidden behind a blink. The lids
       shut, the shape swaps, the lids open.</p>
+    <p>The <strong>weather glances</strong> are what it does every twenty
+      minutes once it is on WiFi: six seconds of the matching face with the
+      conditions animated around it and the temperature in the corner, then
+      back to whatever it was doing.</p>
     <p><span class="kbd">space</span> play/pause &middot;
       <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> previous
       and next clip.</p>
@@ -411,7 +419,13 @@
       { id: "curious", label: "Curious", start: 1570, count: 45, group: "e" },
       { id: "suspicious", label: "Suspicious", start: 1615, count: 45, group: "e" },
       { id: "dizzy", label: "Dizzy", start: 1660, count: 45, group: "e" },
-      { id: "bored", label: "Bored", start: 1705, count: 45, group: "e" }
+      { id: "bored", label: "Bored", start: 1705, count: 45, group: "e" },
+      { id: "wx-clear", label: "Sunny", start: 1750, count: 150, group: "w" },
+      { id: "wx-clear-night", label: "Clear night", start: 1900, count: 150, group: "w" },
+      { id: "wx-cloudy", label: "Overcast", start: 2050, count: 150, group: "w" },
+      { id: "wx-rain", label: "Rain", start: 2200, count: 150, group: "w" },
+      { id: "wx-snow", label: "Snow", start: 2350, count: 150, group: "w" },
+      { id: "wx-storm", label: "Thunderstorm", start: 2500, count: 150, group: "w" }
     ]
   };
 
@@ -534,6 +548,7 @@
 
   buildChips("chips-behaviour", "b");
   buildChips("chips-emotion", "e");
+  buildChips("chips-weather", "w");
   setPlaying(playing);
   requestAnimationFrame(tick);
 </script>

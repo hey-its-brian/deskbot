@@ -22,8 +22,15 @@ const int kMoodCount = (int)(sizeof(kMoods) / sizeof(kMoods[0]));
 
 }  // namespace
 
+void Personality::setIdleTimes(float boredS, float sleepS) {
+  boredS_ = boredS < 5.0f ? 5.0f : boredS;
+  sleepS_ = sleepS < boredS_ ? boredS_ : sleepS;
+}
+
 void Personality::begin(Face& face, uint32_t seed) {
   face_ = &face;
+  boredS_ = DB_IDLE_BORED_S;
+  sleepS_ = DB_IDLE_SLEEP_S;
   rng_.seed(seed ^ 0xA5A5F00Du);
   idle_ = 0.0f;
   moodT_ = rng_.range(2.0f, 5.0f);
@@ -33,7 +40,7 @@ void Personality::begin(Face& face, uint32_t seed) {
 
 Emotion Personality::pickMood() {
   // Ignored for a while? Let it show.
-  if (idle_ > DB_IDLE_BORED_S && rng_.chance(0.6f)) {
+  if (idle_ > boredS_ && rng_.chance(0.6f)) {
     return rng_.chance(0.5f) ? EMOTION_BORED : EMOTION_SLEEPY;
   }
   // Lots of recent attention makes the happy end of the table more likely.
@@ -79,7 +86,7 @@ void Personality::update(float dt) {
   if (idle_ < 1.0e6f) idle_ += dt;  // only ever compared against thresholds
 
   // Attention fades slowly.
-  energy_ = approach(energy_, idle_ > DB_IDLE_BORED_S ? 0.25f : 0.55f, 30.0f, dt);
+  energy_ = approach(energy_, idle_ > boredS_ ? 0.25f : 0.55f, 30.0f, dt);
 
   if (asleep_) {
     sleepT_ -= dt;
@@ -112,7 +119,7 @@ void Personality::update(float dt) {
                                     : rng_.range(2.5f, 6.0f);
   }
 
-  if (idle_ > DB_IDLE_SLEEP_S) sleep();
+  if (idle_ > sleepS_) sleep();
 }
 
 // ---------------------------------------------------------------------------

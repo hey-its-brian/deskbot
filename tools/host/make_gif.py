@@ -42,8 +42,8 @@ CLIPS = [
     (["poke", "110"], 0, 84),      # poked at frame 12: startle, then cheer up
     (["pet", "170"], 0, 160),      # petted: squints up, hearts, heart-eyes, let go
     (["arc", "angry"], 0, 45),
-    (["arc", "sad"], 0, 45),
-    (["arc", "dizzy"], 0, 45),
+    (["weather", "rain", "100"], 0, 100),   # a glance at the weather
+    (["weather", "snow", "100"], 0, 100),
     (["arc", "love"], 0, 45),
 ]
 

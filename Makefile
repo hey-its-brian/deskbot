@@ -8,7 +8,7 @@
 #   make clean
 
 HOST_SRC = tools/host/preview.cpp src/Face.cpp src/Effects.cpp src/Shapes.cpp \
-           src/Personality.cpp
+           src/Personality.cpp src/Weather.cpp
 HOST_FLAGS = -std=c++14 -O2 -Wall -DDESKBUDDY_HOST=1 -Isrc -Itools/host
 EMOTIONS = neutral happy excited sad angry surprised sleepy love curious \
            suspicious dizzy bored

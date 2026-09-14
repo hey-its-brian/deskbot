@@ -207,6 +207,131 @@ void Face::jolt(float strength) {
 }
 
 // ---------------------------------------------------------------------------
+//  Weather
+// ---------------------------------------------------------------------------
+namespace {
+
+Emotion emotionForWeather(WeatherKind k, bool day) {
+  switch (k) {
+    case WX_CLEAR:  return day ? EMOTION_HAPPY : EMOTION_NEUTRAL;
+    case WX_PARTLY: return EMOTION_NEUTRAL;
+    case WX_CLOUDY: return EMOTION_BORED;
+    case WX_FOG:    return EMOTION_SUSPICIOUS;   // peering into it
+    case WX_RAIN:   return EMOTION_SAD;
+    case WX_SNOW:   return EMOTION_CURIOUS;      // watching the flakes
+    case WX_STORM:  return EMOTION_SURPRISED;    // every bolt makes it jump
+    default:        return EMOTION_NEUTRAL;
+  }
+}
+
+}  // namespace
+
+void Face::showWeather(WeatherKind kind, bool isDay, bool hasTemp, int temp,
+                       char unit, float seconds) {
+  if (kind == WX_UNKNOWN || seconds <= 0.0f) return;
+  const Emotion back = holding_ ? afterHold_ : emotion_;
+  wxKind_ = kind;
+  wxDay_ = isDay;
+  wxHasTemp_ = hasTemp;
+  wxTemp_ = temp;
+  wxUnit_ = (unit == 'F') ? 'F' : 'C';
+  wxT_ = seconds;
+  wxFxT_ = 0.0f;
+  wxBoltT_ = 0.8f;
+  flash(emotionForWeather(kind, isDay), seconds, back);
+  if (kind == WX_SNOW || kind == WX_CLOUDY) look(0.0f, -0.5f, seconds);  // eyes up
+  // Overcast starts with clouds already in view instead of an empty sky.
+  if (kind == WX_CLOUDY || kind == WX_PARTLY) {
+    fx_.spawn(FX_CLOUD, 30.0f, 7.0f, 7.0f, 0.0f, 16.0f, 5.0f);
+    if (kind == WX_CLOUDY) fx_.spawn(FX_CLOUD, 84.0f, 5.0f, 6.0f, 0.0f, 16.0f, 4.0f);
+  }
+}
+
+void Face::spawnWeatherEffects(float dt) {
+  wxFxT_ -= dt;
+  switch (wxKind_) {
+    case WX_RAIN:
+    case WX_STORM:
+      if (wxFxT_ <= 0.0f) {
+        fx_.spawn(FX_RAIN, rng_.range(0.0f, 127.0f), -4.0f, -6.0f, 72.0f, 1.1f,
+                  rng_.range(3.0f, 5.0f));
+        wxFxT_ = (wxKind_ == WX_STORM) ? 0.06f : 0.09f;
+      }
+      if (wxKind_ == WX_STORM) {
+        wxBoltT_ -= dt;
+        if (wxBoltT_ <= 0.0f) {
+          wxBoltT_ = rng_.range(1.2f, 2.6f);
+          fx_.spawn(FX_BOLT, rng_.range(12.0f, 116.0f), 0.0f, 0.0f, 0.0f, 0.16f,
+                    rng_.range(14.0f, 22.0f));
+          jolt(0.6f);
+          blink();
+        }
+      }
+      break;
+    case WX_SNOW:
+      if (wxFxT_ <= 0.0f) {
+        fx_.spawn(FX_SNOW, rng_.range(0.0f, 127.0f), -2.0f, 0.0f,
+                  rng_.range(9.0f, 14.0f), 6.0f, rng_.chance(0.4f) ? 2.0f : 1.0f);
+        wxFxT_ = 0.16f;
+      }
+      break;
+    case WX_CLOUDY:
+      if (wxFxT_ <= 0.0f) {
+        fx_.spawn(FX_CLOUD, -16.0f, rng_.range(4.0f, 10.0f), rng_.range(6.0f, 9.0f),
+                  0.0f, 22.0f, rng_.range(4.0f, 5.0f));
+        wxFxT_ = 4.0f;
+      }
+      break;
+    case WX_FOG:
+      if (wxFxT_ <= 0.0f) {
+        const bool fromLeft = rng_.chance(0.5f);
+        fx_.spawn(FX_FOG, fromLeft ? -20.0f : 128.0f, rng_.range(2.0f, 62.0f),
+                  fromLeft ? 7.0f : -7.0f, 0.0f, 20.0f, rng_.range(12.0f, 24.0f));
+        wxFxT_ = 0.45f;
+      }
+      break;
+    case WX_CLEAR:
+      if (!wxDay_ && wxFxT_ <= 0.0f) {    // a twinkle now and then
+        fx_.spawn(FX_STAR, rng_.range(4.0f, 100.0f), rng_.range(2.0f, 12.0f),
+                  0.0f, 0.0f, 0.9f, rng_.chance(0.5f) ? 2.0f : 1.0f);
+        wxFxT_ = rng_.range(0.4f, 0.9f);
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+void Face::drawWeatherOverlay(Canvas& g) {
+  // Sun or moon in the top-right, knocked out of whatever is behind it so
+  // it reads even where it overlaps an eye.
+  if (wxKind_ == WX_CLEAR || wxKind_ == WX_PARTLY) {
+    const int cx = 116, cy = 11;
+    g.fillCircle(cx, cy, 11, DB_BLACK);
+    if (wxDay_) drawSun(g, cx, cy, 5, DB_WHITE);
+    else drawMoon(g, cx, cy, 6, DB_WHITE);
+  }
+  if (wxHasTemp_) {
+    char buf[8];
+    int t = wxTemp_;
+    if (t < -99) t = -99;
+    if (t > 199) t = 199;
+    int n = 0;
+    if (t < 0) { buf[n++] = '-'; t = -t; }
+    if (t >= 100) buf[n++] = (char)('0' + t / 100);
+    if (t >= 10) buf[n++] = (char)('0' + (t / 10) % 10);
+    buf[n++] = (char)('0' + t % 10);
+    buf[n++] = '*';
+    buf[n++] = wxUnit_;
+    buf[n] = 0;
+    const int scale = 2;
+    const int w = tinyTextWidth(buf, scale);
+    g.fillRect(0, DB_SCREEN_H - 5 * scale - 4, w + 5, 5 * scale + 4, DB_BLACK);
+    drawTinyText(g, 2, DB_SCREEN_H - 5 * scale - 2, buf, scale, DB_WHITE);
+  }
+}
+
+// ---------------------------------------------------------------------------
 //  Per-frame update
 // ---------------------------------------------------------------------------
 void Face::spawnMoodEffects(float dt) {
@@ -348,6 +473,10 @@ void Face::update(float dt) {
   cur_.pupil   = approach(cur_.pupil,   tgt_.pupil,   0.10f, dt);
   cur_.bob     = approach(cur_.bob,     tgt_.bob,     0.30f, dt);
 
+  if (wxT_ > 0.0f) {
+    wxT_ -= dt;
+    spawnWeatherEffects(dt);
+  }
   spawnMoodEffects(dt);
   fx_.update(dt);
 }
@@ -508,6 +637,7 @@ void Face::draw(Canvas& g) {
   }
 
   fx_.draw(g);
+  if (wxT_ > 0.0f) drawWeatherOverlay(g);
 }
 
 }  // namespace db
