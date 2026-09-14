@@ -52,7 +52,7 @@ up. A bright static image on an OLED all day is exactly how you etch a panel.
 | USB-C cable | |
 
 Optional: a TTP223-style capacitive touch pad (one wire, and it becomes the
-buddy's head), a printed case (`hardware/case/`) and four M2x8 screws.
+buddy's head), a printed case (`hardware/case/`) and four M2x10 screws.
 
 ## Wiring
 
@@ -217,9 +217,11 @@ half the frame rate.
 ## The case
 
 `hardware/case/` has a parametric two-part OpenSCAD case: a bezel the OLED
-drops into, and a shell that leans the face back about 14 degrees and holds
-the Super Mini. Four M2x8 self-tapping screws hold it together, and the touch
-pad tapes to the inside of the top wall.
+drops into, and a closed 35 mm deep shell behind it - the same outline as the
+face, leaning back 12 degrees - with the Super Mini on a shelf inside and its
+USB-C port through the back wall. Nothing shows but the face and a cable.
+Four M2x10 self-tapping screws hold it together, and the touch pad tapes to
+the inside of the top wall.
 
 It is untested on a printer, and 0.96" OLED modules vary by a millimetre
 between batches, so put calipers on yours and check the dimensions first.
