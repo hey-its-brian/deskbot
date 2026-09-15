@@ -56,6 +56,13 @@ post_d         = 5.4;
 post_len       = 9;
 button_d       = 0;      // 0 = none; 6.2 or 12.2 for a panel-mount button
                          // wired to GPIO9/GND, since BOOT is inside the box
+
+/* [ Touch pad ] */
+touch_recess   = true;   // thin the top wall where the touch pad sits, so a
+touch_pad      = 26;     // 26 x 26 mm electrode (copper tape) senses through
+touch_wall     = 1.2;    // this much PLA instead of the full wall
+touch_y        = 6;      // recess starts this far behind the face
+
 $fn            = 48;
 
 // ---------------------------------------------------------------------------
@@ -125,6 +132,13 @@ module cavity() {
 }
 
 module back_features() {
+  // Thinner top wall under the touch electrode. It is a pocket on the
+  // inside of the top, so it prints as a vertical recess with the shell
+  // back-wall-down - no overhang.
+  if (touch_recess)
+    translate([-touch_pad / 2, touch_y, case_h - wall - 0.01])
+      cube([touch_pad, touch_pad, wall - touch_wall + 0.01]);
+
   // USB-C, level with the MCU sitting on its shelf.
   translate([0, 0, shelf_z + mcu_pcb_t + usb_h / 2 - 0.4])
     back_cut(case_d - wall - 0.5, wall + 1) rrect(usb_w, usb_h, 1.5);
