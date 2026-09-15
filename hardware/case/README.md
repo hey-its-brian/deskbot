@@ -37,6 +37,7 @@ millimetre between batches. Put calipers on yours and check these first:
 | `case_d` | shell depth, 35 mm by default |
 | `lean` | tilt; 12 degrees suits a desk at arm's length |
 | `fit` | global clearance; raise to 0.5 if parts bind |
+| `touch_wall` | plastic left under the touch electrode, 1.2 mm; go to 1.0 if touches are still weak |
 
 ## The BOOT button is inside the box
 
@@ -57,8 +58,16 @@ it. Two options:
    against the front; a strip of foam tape on the back of the PCB stops it
    rattling if the fit is loose.
 2. Wire the OLED (4 wires) and the touch pad (3) to the Super Mini with
-   ~60 mm leads. Tape the touch pad to the **inside of the shell's top wall**
-   near the front - it senses through the 2.2 mm of PLA.
+   ~60 mm leads. The **touch pad goes under the recess in the top wall**,
+   near the front, where the plastic is thinned to 1.2 mm. The TTP223's own
+   pad is small and marginal through a case wall, so give it a bigger
+   electrode: a 25 x 25 mm square of copper or aluminium tape pressed flat
+   into the recess, joined to the module's sensing pad with a short wire
+   (most TTP223 boards have a through-hole or exposed edge on the pad for
+   this). The pad side must face the plastic with no air gap - foam tape
+   behind the module keeps it pressed. If the module has a capacitor
+   populated at *Cs* / *C*, removing it raises sensitivity further (less
+   capacitance = more sensitive; an empty footprint is already maximum).
 3. Slide the Super Mini onto the shelf, USB-C end first, until the port sits
    in the back-wall slot. The side ribs locate it; the lip at the front stops
    it sliding forward.

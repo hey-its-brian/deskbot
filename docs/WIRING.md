@@ -37,11 +37,15 @@ Two things worth knowing about these modules:
   behaves: A flips the output polarity, B turns it into a toggle (touch once
   on, touch again off). **Leave both open.** In toggle mode the tap-vs-hold
   logic can't work.
-- It senses **through 2-3 mm of plastic**. Stick the pad to the inside of
-  the case top and the whole head becomes touch sensitive with nothing
-  visible from outside - which is exactly how EMO's head pats feel. If it
-  triggers on its own, move it away from the ESP32's antenna end or add a
-  ground plane (a bit of foil under GND) behind it.
+- It senses through plastic, but the module's own ~10 mm pad is marginal
+  through a case wall. Sensitivity is set by **electrode area** and by the
+  *Cs* capacitor on the board (less capacitance = more sensitive; an empty
+  *Cs* footprint is already maximum). For a case, wire a 25 x 25 mm piece
+  of copper or aluminium tape to the module's sensing pad and press it flat
+  against the inside of the top - the printed case has a recess there with
+  the wall thinned to 1.2 mm. That is how EMO-style head pats are done. If
+  it then triggers on its own, move it away from the ESP32's antenna end
+  or add a ground plane (a bit of foil under GND) behind it.
 
 Set `DB_PIN_TOUCH` to `-1` if you don't have one; nothing else changes.
 
