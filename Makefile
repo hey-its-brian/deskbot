@@ -8,6 +8,11 @@
 #   make monitor   open the serial console
 #   make clean
 
+# PlatformIO Core phones home with anonymous usage stats unless told not to.
+# This keeps every pio call made through make quiet. To make it stick for
+# bare `pio` commands too, run once: pio settings set enable_telemetry No
+export PLATFORMIO_SETTING_ENABLE_TELEMETRY = No
+
 HOST_SRC = tools/host/preview.cpp src/Face.cpp src/Effects.cpp src/Shapes.cpp \
            src/Personality.cpp src/Weather.cpp
 HOST_FLAGS = -std=c++14 -O2 -Wall -DDESKBUDDY_HOST=1 -Isrc -Itools/host

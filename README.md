@@ -85,6 +85,14 @@ pio device monitor     # or: make monitor
 `platformio.ini` pulls in the libraries and the toolchain. The Super Mini
 shows up as a native USB CDC port - no drivers, no BOOT-button dance.
 
+PlatformIO Core sends anonymous usage telemetry by default. The `make`
+targets switch it off for every call they make; to turn it off for bare `pio`
+commands as well, once per machine:
+
+```sh
+pio settings set enable_telemetry No
+```
+
 After that first flash, once it is on WiFi, updates go over the air:
 
 ```sh
